@@ -33,10 +33,12 @@ class SoftwareList(object):
 
 
 class Software(object):
-    def __init__(self, name, version=''):
+    def __init__(self, name, version='', package=''):
         self.name = name
         self.version = version
+        self.package = package
         self.machine_to_version = {}
+        self.machine_to_package = {}
 
     @classmethod
     def from_yaml(cls, key, val):
@@ -49,28 +51,46 @@ class Software(object):
 
     def inspect_on_machines(self, machines):
         version_count = defaultdict(list)
+        package_count = defaultdict(list)
         for machine in machines:
-            output, success = ssh.client.exec_on_machine(machine, f'{self.name} --version | grep {self.name}')
+            cmd = f"{self.name} --version | grep {self.name} | awk '{{print \"version:\" $0}}'; dpkg -S `which {self.name}` | awk -F: '{{print \"package:\" $1}}'"
+            output, success = ssh.client.exec_on_machine(machine, cmd)
             if not success:
                 self.machine_to_version[machine] = 'unknown'
-                return
-            version = output.stdout.strip()
-            self.machine_to_version[machine] = version
-            version_count[version].append(machine)
+                continue
+            ret = output.stdout.strip()
+            for line in ret.split('\n'):
+                k, v = line.split(':')
+                if k == 'version':
+                    self.machine_to_version[machine] = v
+                    version_count[v].append(machine)
+                elif k == 'package':
+                    self.machine_to_package[machine] = v
+                    package_count[v].append(machine)
 
-        to_remove = []
+        count = 0
         version_to_display = ''
         for version, machines in version_count.items():
-            if len(machines) > len(to_remove):
-                to_remove = machines
+            if len(machines) > count:
+                count = len(machines)
                 version_to_display = version
         self.version = version_to_display
 
+        count = 0
+        package_to_display = ''
+        for package, machines in package_count.items():
+            if len(machines) > count:
+                count = len(machines)
+                package_to_display = package
+        self.package = package_to_display
+
     def to_dict(self):
         ret = {'version': self.version}
-        mismatch= {k: v for k, v in self.machine_to_version.items() if v != self.version}
+        mismatch = {k: v for k, v in self.machine_to_version.items() if v != self.version}
         if mismatch:
             ret['mismatch'] = mismatch
+        if self.package != '':
+            ret['pacakge'] = self.package
         return ret
 
 

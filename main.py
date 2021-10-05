@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 
 from machine import machine_list
 from software import software_list
+from usergroup import user_list
 
 # @click.command()
 # @click.option('--count', default=1, help='Number of greetings.')
@@ -26,11 +27,13 @@ def cli():
 def init():
     machine_list.inspect_all()
     software_list.inspect_all_on_machines(machine_list.machines.keys())
+    user_list.inspect_all_on_machines(machine_list.machines.keys())
 
 
 if __name__ == '__main__':
     machine_list.load_yaml('machine-list.yaml')
     software_list.load_yaml('software-list.yaml')
+    user_list.load_yaml('user-list.yaml')
 
     cli.add_command(init)
     cli()
