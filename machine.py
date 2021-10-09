@@ -18,11 +18,14 @@ class MachineList(object):
                 self.machines[name] = Machine.from_yaml(name, attr)
 
     def inspect_all(self):
+        print('inspecting machines')
         for machine in self.machines.values():
+            print(f'inspecting machine {machine.name}')
             machine.inspect()
         self.write_back()
 
     def write_back(self):
+        print('write back to machine-list')
         with open(self.filepath, 'w') as f:
             machine_dict = {}
             for machine in self.machines.values():

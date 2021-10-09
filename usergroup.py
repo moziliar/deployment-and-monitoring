@@ -20,7 +20,9 @@ class UserList(object):
                 self.user_groups[name] = UserGroup.from_yaml(name, attr)
 
     def inspect_all_on_machines(self, machines):
+        print('inspecting users on machines')
         for user_group in self.user_groups.values():
+            print(f'inspecting usergroup {user_group.name}')
             user_group.inspect_on_machines(machines)
         self.write_back()
 

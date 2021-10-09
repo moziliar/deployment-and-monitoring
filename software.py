@@ -20,7 +20,9 @@ class SoftwareList(object):
                 self.softwares[name] = Software.from_yaml(name, attr)
 
     def inspect_all_on_machines(self, machines):
+        print('inspecting software on machines')
         for software in self.softwares.values():
+            print(f'inspecting software {software.name}')
             software.inspect_on_machines(machines)
         self.write_back()
 
