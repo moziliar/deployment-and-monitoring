@@ -7,6 +7,6 @@ warnLogPath = f'{logDir}/warn.log'
 
 sshLogPath = f'{logDir}/ssh.log'
 
-sshKeyPath = os.path.join(os.environ["HOME"], ".ssh", "id_rsa")
+defaultSSHKeyPath = os.path.join(os.environ["HOME"], ".ssh", "id_rsa")
 
 nodesToMonitor = []

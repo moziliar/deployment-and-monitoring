@@ -1,14 +1,17 @@
 from enum import Enum
+import os
 
 import yaml
+from typing import Dict, Set
 
 import ssh
+from report import report
 
 
 class MachineList(object):
     def __init__(self):
-        self.filepath = ''
-        self.machines = {}
+        self.filepath: str = ''
+        self.machines: Dict[str, Machine] = {}
 
     def load_yaml(self, filepath):
         self.filepath = filepath
@@ -17,12 +20,22 @@ class MachineList(object):
             for name, attr in machines.items():
                 self.machines[name] = Machine.from_yaml(name, attr)
 
+        print('machines read; try setting up ssh-copy-id on machines')
+        for machine in self.machines.keys():
+            os.system(f'ssh-copy-id {os.getenv("SSH_USER")}@{machine}')
+
     def inspect_all(self):
         print('inspecting machines')
         for machine in self.machines.values():
             print(f'inspecting machine {machine.name}')
             machine.inspect()
         self.write_back()
+
+    def introspect(self):
+        print('introspecting machines in files')
+        for machine in self.machines.values():
+            machine.introspect()
+        print('machines ready to sync')
 
     def write_back(self):
         print('write back to machine-list')
@@ -39,10 +52,20 @@ class MachineStatus(Enum):
     UNREACHABLE = 'unreachable'
 
 
-class Machine(object):
-    dynamic_variables = {'status'}
+class MachineCannotSyncException(Exception):
+    pass
 
-    def __str__(self):
+
+class Machine(object):
+    dynamic_fields: Set[str] = {'status'}
+    static_fields: Set[str] = {
+        'name',
+        'os',
+        'kernel',
+        'version',
+    }
+
+    def __str__(self) -> str:
         return f'nodename: {self.name}, status: {self.status=}, os: {self.os}, version: {self.version}'
 
     def __init__(self, name):
@@ -53,12 +76,12 @@ class Machine(object):
         self.version = ''
 
     @classmethod
-    def from_yaml(cls, key, val):
+    def from_yaml(cls, key, val) -> 'Machine':
         m = cls(key)
         if type(val) != dict:
             return m
         for k, v in val.items():
-            if k in cls.dynamic_variables:
+            if k in cls.dynamic_fields:
                 continue
             m.__setattr__(k, v)
         return m
@@ -72,12 +95,28 @@ class Machine(object):
         if len(parsed) < 3:
             # TODO: handle failure
             return
-        self.os = parsed[0]
-        self.kernel = parsed[1]
-        self.version = parsed[2]
+        [os, kernel, version, *_] = parsed
+
+        report.check_and_report_diff('machine', self.name, 'os', self.os, os)
+        self.os = os
+        report.check_and_report_diff('machine', self.name, 'kernel', self.kernel, kernel)
+        self.kernel = kernel
+        report.check_and_report_diff('machine', self.name, 'version', self.version, version)
+        self.version = version
+
         self.status = MachineStatus.READY
 
-    def to_dict(self):
+    '''
+    :raises MachineCannotSyncException
+    '''
+    def introspect(self):
+        if self.status is None or self.status != MachineStatus.READY:
+            return
+        for attr in Machine.static_fields:
+            if self.__getattribute__(attr) == '':
+                raise MachineCannotSyncException
+
+    def to_dict(self) -> Dict[str, str]:
         ret = {
             'status': self.status.name
         }

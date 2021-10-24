@@ -3,7 +3,8 @@ import os
 import click
 from dotenv import load_dotenv
 
-from machine import machine_list
+from machine import machine_list, MachineCannotSyncException
+from report import report
 from software import software_list
 from usergroup import user_list
 
@@ -29,6 +30,22 @@ def init():
     software_list.inspect_all_on_machines(machine_list.machines.keys())
     user_list.inspect_all_on_machines(machine_list.machines.keys())
 
+    report.save_to_yaml()
+
+
+@click.command()
+def sync():
+    try:
+        machine_list.introspect()
+    except MachineCannotSyncException:
+        print('machines not ready to sync')
+        return
+
+    software_list.inspect_all_on_machines(machine_list.machines.keys())
+    user_list.inspect_all_on_machines(machine_list.machines.keys())
+
+    report.save_to_yaml()
+
 
 if __name__ == '__main__':
     machine_list.load_yaml('machine-list.yaml')
@@ -36,4 +53,5 @@ if __name__ == '__main__':
     user_list.load_yaml('user-list.yaml')
 
     cli.add_command(init)
+    cli.add_command(sync)
     cli()

@@ -29,12 +29,13 @@ class SSH(object):
         client.load_system_host_keys()
         client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 
-        key = paramiko.RSAKey.from_private_key_file(config.sshKeyPath, password=os.getenv("SSH_PASSWORD"))
+        key = paramiko.RSAKey.from_private_key_file(config.defaultSSHKeyPath, password=os.getenv("SSH_PASSWORD"))
         client.connect(
             hostname=host['hostname'],
             username=os.getenv("SSH_USER"),
             pkey=key,
-            sock=paramiko.ProxyCommand(host.get('proxycommand'))
+            sock=paramiko.ProxyCommand(host.get('proxycommand')),
+            timeout=3,
         )
 
         self.ssh_conns[hostname] = client

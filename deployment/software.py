@@ -26,6 +26,13 @@ class SoftwareList(object):
             software.inspect_on_machines(machines)
         self.write_back()
 
+    def diff_all_on_machines(self, machines):
+        print('check difference in software on machines')
+        for software in self.softwares.values():
+            print(f'inspecting software {software.name}')
+            software.inspect_on_machines(machines)
+        self.write_back()
+
     def write_back(self):
         with open(self.filepath, 'w') as f:
             software_dict = {}
