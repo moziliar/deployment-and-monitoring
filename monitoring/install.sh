@@ -4,7 +4,7 @@ chmod +x scripts/install_prometheus.sh
 ./scripts/install_prometheus.sh
 
 chmod +x scripts/install_node_exporter.sh
-./scripts/install_node_exporter
+./scripts/install_node_exporter.sh
 
 chmod +x scripts/install_reverse_tunnel.sh
 ./scripts/install_reverse_tunnel.sh

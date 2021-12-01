@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 
 # Install Prometheus
+if [[ ! -d /usr/lib/systemd/system ]]; then
+  mkdir /usr/lib/systemd/system
+fi
+
 if [[ -e /usr/lib/systemd/system/node_exporter.service ]]; then
   echo node_exporter service file exists
 else
