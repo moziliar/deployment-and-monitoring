@@ -4,7 +4,7 @@
 if [[ -e /usr/lib/systemd/system/prometheus.service ]]; then
   echo prometheus service file exists
 else
-  cp ../template/prometheus.service /usr/lib/systemd/system/prometheus.service
+  cp ./template/prometheus.service /usr/lib/systemd/system/prometheus.service
 fi
 
 if [[ -e /usr/local/bin/prometheus ]]; then
