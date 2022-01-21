@@ -11,6 +11,10 @@ if [[ ! -d /etc/prometheus ]]; then
   mkdir /etc/prometheus
 fi
 
+if [[ ! -d /var/lib/prometheus ]]; then
+  mkdir /var/lib/prometheus
+fi
+
 if [[ -e /usr/local/bin/prometheus ]]; then
   echo prometheus version "${/usr/local/bin/prometheus --version}" exists
   exit
