@@ -19,9 +19,8 @@ fi
 # Create prom user and change owner of dir
 useradd --no-create-home --shell /bin/false prometheus
 chown prometheus:prometheus /etc/prometheus
-chown prometheus:prometheus /var/lib/prometheus
 
-wget https://github.com/prometheus/prometheus/releases/download/v2.31.0-rc.0/prometheus-2.31.0-rc.0.linux-amd64.tar.gz
+wget -q https://github.com/prometheus/prometheus/releases/download/v2.31.0-rc.0/prometheus-2.31.0-rc.0.linux-amd64.tar.gz
 tar xvfz prometheus-2.31.0-rc.0.linux-amd64.tar.gz
 cd prometheus-2.31.0-rc.0.linux-amd64
 cp prometheus /usr/local/bin/prometheus
