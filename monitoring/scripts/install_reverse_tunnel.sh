@@ -11,7 +11,7 @@ else
   sed -e "s|TARGET_PORT|$TARGET_PORT|g"\
     -e "s|KEY_FILE|$KEY_FILE|g"\
     -e "s|REMOTE_TARGET|$REMOTE_TARGET|g"\
-    -e "s|REMOTE_USER|REMOTE_USER|g"\
+    -e "s|REMOTE_USER|$REMOTE_USER|g"\
     ./template/node_exporter_reverse_tunnel.service\
     > /usr/lib/systemd/system/node_exporter_reverse_tunnel.service
 fi
