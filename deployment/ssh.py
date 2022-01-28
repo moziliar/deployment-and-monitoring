@@ -6,7 +6,7 @@ from paramiko import util
 from configs import config
 
 port = 22
-# paramiko.util.log_to_file(config.sshLogPath, level=logging.DEBUG)
+paramiko.util.log_to_file(config.sshLogPath, level=logging.DEBUG)
 
 
 class SSH(object):
@@ -20,7 +20,6 @@ class SSH(object):
     def setup_connection_to_host(self, hostname):
         if hostname in self.ssh_conns:
             return None
-
         conf = paramiko.SSHConfig()
         conf.parse(open(os.path.expanduser('~/.ssh/config')))
         host = conf.lookup(hostname)

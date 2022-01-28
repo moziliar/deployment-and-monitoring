@@ -3,21 +3,16 @@ from collections import defaultdict
 import yaml
 
 import ssh
+import basedata
 
 
-class SoftwareList(object):
+class SoftwareList(basedata.Data):
     def __init__(self):
+        super().__init__()
         self.softwares = {}
-        self.filepath = ''
 
-    def load_yaml(self, filepath):
-        self.filepath = filepath
-        with open(filepath, 'r') as f:
-            _software_list = yaml.safe_load(f)
-            if not software_list:
-                return
-            for name, attr in _software_list.items():
-                self.softwares[name] = Software.from_yaml(name, attr)
+    def load_object(self, name, attr):
+        self.softwares[name] = Software.from_yaml(name, attr)
 
     def inspect_all_on_machines(self, machines):
         print('inspecting software on machines')
@@ -33,30 +28,17 @@ class SoftwareList(object):
             software.inspect_on_machines(machines)
         self.write_back()
 
-    def write_back(self):
-        with open(self.filepath, 'w') as f:
-            software_dict = {}
-            for software in self.softwares.values():
-                software_dict[software.name] = software.to_dict()
-            yaml.dump(software_dict, f)
+    def get_data(self):
+        return self.softwares
 
 
-class Software(object):
+class Software(basedata.DataEntity):
     def __init__(self, name, version='', package=''):
-        self.name = name
+        super().__init__(name)
         self.version = version
         self.package = package
         self.machine_to_version = {}
         self.machine_to_package = {}
-
-    @classmethod
-    def from_yaml(cls, key, val):
-        s = cls(key)
-        if type(val) != dict:
-            return s
-        for k, v in val.items():
-            s.__setattr__(k, v)
-        return s
 
     def inspect_on_machines(self, machines):
         version_count = defaultdict(list)

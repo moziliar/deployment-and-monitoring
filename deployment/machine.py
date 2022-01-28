@@ -1,3 +1,4 @@
+from email.mime import base
 from enum import Enum
 import os
 
@@ -6,23 +7,22 @@ from typing import Dict, Set
 
 import ssh
 from report import report
+import basedata
 
-
-class MachineList(object):
+class MachineList(basedata.Data):
     def __init__(self):
-        self.filepath: str = ''
+        super().__init__()
         self.machines: Dict[str, Machine] = {}
 
     def load_yaml(self, filepath):
-        self.filepath = filepath
-        with open(filepath, 'r') as f:
-            machines = yaml.safe_load(f)
-            for name, attr in machines.items():
-                self.machines[name] = Machine.from_yaml(name, attr)
+        super().load_yaml(filepath)
 
         print('machines read; try setting up ssh-copy-id on machines')
-        for machine in self.machines.keys():
-            os.system(f'ssh-copy-id {os.getenv("SSH_USER")}@{machine}')
+        # for machine in self.machines.keys():
+            # os.system(f'ssh-copy-id {os.getenv("SSH_USER")}@{machine}')
+    
+    def load_object(self, name, attr):
+        self.machines[name] = Machine.from_yaml(name, attr)
 
     def inspect_all(self):
         print('inspecting machines')
@@ -37,13 +37,8 @@ class MachineList(object):
             machine.introspect()
         print('machines ready to sync')
 
-    def write_back(self):
-        print('write back to machine-list')
-        with open(self.filepath, 'w') as f:
-            machine_dict = {}
-            for machine in self.machines.values():
-                machine_dict[machine.name] = machine.to_dict()
-            yaml.dump(machine_dict, f)
+    def get_data(self):
+        return self.machines
 
 
 class MachineStatus(Enum):
@@ -56,7 +51,7 @@ class MachineCannotSyncException(Exception):
     pass
 
 
-class Machine(object):
+class Machine(basedata.DataEntity):
     dynamic_fields: Set[str] = {'status'}
     static_fields: Set[str] = {
         'name',
@@ -69,22 +64,11 @@ class Machine(object):
         return f'nodename: {self.name}, status: {self.status=}, os: {self.os}, version: {self.version}'
 
     def __init__(self, name):
-        self.name = name
+        super().__init__(name)
         self.status = MachineStatus.UNKNOWN
         self.os = ''
         self.kernel = ''
         self.version = ''
-
-    @classmethod
-    def from_yaml(cls, key, val) -> 'Machine':
-        m = cls(key)
-        if type(val) != dict:
-            return m
-        for k, v in val.items():
-            if k in cls.dynamic_fields:
-                continue
-            m.__setattr__(k, v)
-        return m
 
     def inspect(self):
         output, success = ssh.client.exec_on_machine(self.name, 'uname -s; uname -r; lsb_release -ds')

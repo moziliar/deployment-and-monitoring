@@ -4,20 +4,15 @@ import yaml
 
 import ssh
 
+import basedata
 
-class UserList(object):
+class UserList(basedata.Data):
     def __init__(self):
+        super().__init__()
         self.user_groups = {}
-        self.filepath = ''
 
-    def load_yaml(self, filepath):
-        self.filepath = filepath
-        with open(filepath, 'r') as f:
-            _user_group_list = yaml.safe_load(f)
-            if not _user_group_list:
-                return
-            for name, attr in _user_group_list.items():
-                self.user_groups[name] = UserGroup.from_yaml(name, attr)
+    def load_object(self, name, attr):
+        self.user_groups[name] = UserGroup.from_yaml(name, attr)
 
     def inspect_all_on_machines(self, machines):
         print('inspecting users on machines')
@@ -26,27 +21,14 @@ class UserList(object):
             user_group.inspect_on_machines(machines)
         self.write_back()
 
-    def write_back(self):
-        with open(self.filepath, 'w') as f:
-            user_group_dict = {}
-            for user_group in self.user_groups.values():
-                user_group_dict[user_group.name] = user_group.to_dict()
-            yaml.dump(user_group_dict, f)
+    def get_data(self):
+        return self.user_groups
 
 
-class UserGroup(object):
+class UserGroup(basedata.DataEntity):
     def __init__(self, name):
-        self.name = name
+        super().__init__(name)
         self.user_to_machines = defaultdict(list)
-
-    @classmethod
-    def from_yaml(cls, key, val):
-        u = cls(key)
-        if type(val) != dict:
-            return u
-        for k, v in val.items():
-            u.__setattr__(k, v)
-        return u
 
     def inspect_on_machines(self, machines):
         for machine in machines:

@@ -1,4 +1,11 @@
+bin
+lib
 log
+include
+**/__pycache__
+
 .env
 machine-list.yaml
 software-list.yaml
+user-list.yaml
+pyvenv.cfg
