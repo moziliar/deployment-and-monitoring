@@ -2,6 +2,7 @@ import os
 
 import click
 from dotenv import load_dotenv
+import yaml
 
 from machine import machine_list, MachineCannotSyncException
 from report import report
@@ -42,7 +43,8 @@ def sync():
         return
 
     software_list.inspect_all_on_machines(machine_list.machines.keys())
-    user_list.inspect_all_on_machines(machine_list.machines.keys())
+    with open('play.yaml', 'w') as f:
+        yaml.dump(user_list.diff_all_on_machines(machine_list.machines.keys()), f)
 
     report.save_to_yaml()
 

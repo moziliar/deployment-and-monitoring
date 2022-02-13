@@ -14,6 +14,9 @@ class SoftwareList(basedata.Data):
     def load_object(self, name, attr):
         self.softwares[name] = Software.from_yaml(name, attr)
 
+    def get_data(self):
+        return self.softwares
+
     def inspect_all_on_machines(self, machines):
         print('inspecting software on machines')
         for software in self.softwares.values():
@@ -27,9 +30,6 @@ class SoftwareList(basedata.Data):
             print(f'inspecting software {software.name}')
             software.inspect_on_machines(machines)
         self.write_back()
-
-    def get_data(self):
-        return self.softwares
 
 
 class Software(basedata.DataEntity):

@@ -1,5 +1,11 @@
 import yaml
 
+yaml.SafeDumper.add_representer(
+    type(None),
+    lambda dumper, value: dumper.represent_scalar(u'tag:yaml.org,2002:null', '')
+)
+
+
 class Data(object):
     def __init__(self):
         self.filepath = ''
@@ -24,7 +30,7 @@ class Data(object):
             data_dict = {}
             for data_entry in self.get_data().values():
                 data_dict[data_entry.name] = data_entry.to_dict()
-            yaml.dump(data_dict, f)
+            yaml.safe_dump(data_dict, f, default_flow_style=False)
 
 
 class DataEntity(object):
