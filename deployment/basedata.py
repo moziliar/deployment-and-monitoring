@@ -10,14 +10,16 @@ class Data(object):
     def __init__(self):
         self.filepath = ''
 
-    def load_yaml(self, filepath):
-        self.filepath = filepath
+    @classmethod
+    def open_yaml(filepath):
         with open(filepath, 'r') as f:
-            data = yaml.safe_load(f)
-            if not data:
-                return
-            for name, attr in data.items():
-                self.load_object(name, attr)
+            return yaml.safe_load(f)
+
+    def load_yaml(self, data):
+        if not data:
+            return
+        for name, attr in data.items():
+            self.load_object(name, attr)
 
     def load_object(self, name, attr):
         pass

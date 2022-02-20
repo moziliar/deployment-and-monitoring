@@ -52,9 +52,12 @@ def sync():
 
 
 if __name__ == '__main__':
-    machine_list.load_yaml('machine-list.yaml')
-    software_list.load_yaml('software-list.yaml')
-    user_list.load_yaml('user-list.yaml')
+    machine_list_data = machine_list.open_yaml('machine-list.yaml')
+    software_list_data = software_list.open_yaml('software-list.yaml')
+    user_list_data = user_list.open_yaml('user-list.yaml')
+    machine_list.load_yaml(machine_list_data)
+    software_list.load_yaml(software_list_data)
+    user_list.load_yaml(user_list_data)
 
     cli.add_command(init)
     cli.add_command(sync)
