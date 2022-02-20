@@ -39,7 +39,7 @@ def get_sync_user_play(hosts, remote_user, users_to_add, users_to_remove):
     new_play = deepcopy(_sync_user_play)
     new_play['hosts'] = hosts
     new_play['remote_user'] = remote_user
-    
+
     new_play['tasks'] += map(lambda u: get_add_user_task(u.name, u.group), users_to_add)
     new_play['tasks'] += map(lambda u: get_remove_user_task(u.name, u.group), users_to_remove)
     
@@ -76,3 +76,28 @@ def get_expire_user_password(name):
     expire_password['name'] = expire_password['name'].substitute(username=name)
     expire_password['command'] = expire_password['command'].substitute(username=name)
     return expire_password
+
+
+_sync_software_play = {
+    'name': 'Update lab machines',
+    'hosts': 'TODO',
+    'remote_user': 'TODO',
+    'tasks': []
+}
+
+def get_install_software(software, version='latest'):
+    return {
+        'name': f'Ensure {software} is installed and at version specified',
+        'ansible.builtin.apt': {
+            'name': software,
+            'version': version
+        }
+    }
+
+def get_sync_software_play(hosts, remote_user, softwares_to_install):
+    new_play = deepcopy(_sync_software_play)
+    new_play['hosts'] = hosts
+    new_play['remote_user'] = remote_user
+
+    new_play['tasks'] += map(lambda s: get_install_software(s.name, s.version), softwares_to_install)
+    return new_play

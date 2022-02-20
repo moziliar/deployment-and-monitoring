@@ -34,7 +34,7 @@ class SSH(object):
             username=os.getenv("SSH_USER"),
             pkey=key,
             sock=paramiko.ProxyCommand(host.get('proxycommand')),
-            timeout=3,
+            timeout=1,
         )
 
         self.ssh_conns[hostname] = client

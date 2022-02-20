@@ -42,9 +42,11 @@ def sync():
         print('machines not ready to sync')
         return
 
-    software_list.inspect_all_on_machines(machine_list.machines.keys())
-    with open('play.yaml', 'w') as f:
+    with open('user_play.yaml', 'w') as f:
         yaml.dump(user_list.diff_all_on_machines(machine_list.machines.keys()), f)
+    
+    with open('software_play.yaml', 'w') as f:
+        yaml.dump(software_list.diff_all_on_machines(machine_list.machines.keys()), f)
 
     report.save_to_yaml()
 

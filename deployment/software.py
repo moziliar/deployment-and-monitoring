@@ -4,6 +4,7 @@ import yaml
 
 import ssh
 import basedata
+import templates
 
 
 class SoftwareList(basedata.Data):
@@ -29,7 +30,11 @@ class SoftwareList(basedata.Data):
         for software in self.softwares.values():
             print(f'inspecting software {software.name}')
             software.inspect_on_machines(machines)
-        self.write_back()
+        return templates.get_sync_software_play(
+            'labmachines', 
+            'mzr',
+            list(self.softwares.values())
+        )
 
 
 class Software(basedata.DataEntity):
