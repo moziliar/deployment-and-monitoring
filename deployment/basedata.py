@@ -11,7 +11,7 @@ class Data(object):
         self.filepath = ''
 
     @classmethod
-    def open_yaml(filepath):
+    def open_yaml(cls, filepath):
         with open(filepath, 'r') as f:
             return yaml.safe_load(f)
 

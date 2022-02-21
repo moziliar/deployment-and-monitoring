@@ -38,7 +38,7 @@ class SoftwareList(basedata.Data):
 
 
 class Software(basedata.DataEntity):
-    def __init__(self, name, version='', package=''):
+    def __init__(self, name, version='latest', package=''):
         super().__init__(name)
         self.version = version
         self.package = package

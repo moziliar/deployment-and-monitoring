@@ -57,13 +57,13 @@ def get_user_info(name, group):
 def get_add_user_task(name, group):
     return {
         'name': f'add user {name}',
-        'ansible.builtin.user': get_user_info(name, group)
+        'user': get_user_info(name, group)
     }
 
 def get_remove_user_task(name, group):
     return {
         'name': f'remove user {name}',
-        'ansible.builtin.user': get_user_info(name, group) | _remove_user_suffix
+        'user': get_user_info(name, group) | _remove_user_suffix
     }
 def get_remove_user_password(name):
     remove_password = deepcopy(_remove_password)
@@ -85,12 +85,12 @@ _sync_software_play = {
     'tasks': []
 }
 
-def get_install_software(software, version='latest'):
+def get_install_software(software):
     return {
-        'name': f'Ensure {software} is installed and at version specified',
-        'ansible.builtin.apt': {
+        'name': f'Ensure {software} is installed and at the latest version',
+        'apt': {
             'name': software,
-            'version': version
+            'state': 'latest',
         }
     }
 
@@ -99,5 +99,5 @@ def get_sync_software_play(hosts, remote_user, softwares_to_install):
     new_play['hosts'] = hosts
     new_play['remote_user'] = remote_user
 
-    new_play['tasks'] += map(lambda s: get_install_software(s.name, s.version), softwares_to_install)
+    new_play['tasks'] += map(lambda s: get_install_software(s.name), softwares_to_install)
     return new_play
