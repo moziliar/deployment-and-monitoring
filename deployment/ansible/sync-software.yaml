@@ -4,6 +4,10 @@
   remote_user: mzr
 
   tasks:
+  - name: Ensure go is at the latest version
+    snap:
+      name: go
+      classic: yes
   - name: Ensure clang-11 is at the latest version
     ansible.builtin.apt:
       name: clang-11
@@ -22,16 +26,6 @@
   - name: Ensure libc++-abi-11-dev is at the latest version
     ansible.builtin.apt:
       name: libc++abi-11-dev      
-      state: latest
-
-  - name: Ensure libc++-12-dev is at the latest version
-    ansible.builtin.apt:
-      name: libc++-12-dev
-      state: latest
-
-  - name: Ensure libc++-abi-12-dev is at the latest version
-    ansible.builtin.apt:
-      name: libc++abi-12-dev      
       state: latest
 
   - name: Ensure htop is at the latest version

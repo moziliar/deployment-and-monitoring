@@ -58,10 +58,15 @@ class Machine(basedata.DataEntity):
         'os',
         'kernel',
         'version',
+        'role',
     }
 
     def __str__(self) -> str:
-        return f'nodename: {self.name}, status: {self.status=}, os: {self.os}, version: {self.version}'
+        return f'nodename: {self.name}, \
+                status: {self.status=}, \
+                os: {self.os}, \
+                version: {self.version}, \
+                role: {self.role}'
 
     def __init__(self, name):
         super().__init__(name)
@@ -69,6 +74,7 @@ class Machine(basedata.DataEntity):
         self.os = ''
         self.kernel = ''
         self.version = ''
+        self.role = ''
 
     def inspect(self):
         output, success = ssh.client.exec_on_machine(self.name, 'uname -s; uname -r; lsb_release -ds')
@@ -81,11 +87,8 @@ class Machine(basedata.DataEntity):
             return
         [os, kernel, version, *_] = parsed
 
-        report.check_and_report_diff('machine', self.name, 'os', self.os, os)
         self.os = os
-        report.check_and_report_diff('machine', self.name, 'kernel', self.kernel, kernel)
         self.kernel = kernel
-        report.check_and_report_diff('machine', self.name, 'version', self.version, version)
         self.version = version
 
         self.status = MachineStatus.READY
@@ -110,6 +113,8 @@ class Machine(basedata.DataEntity):
             ret['kernel'] = self.kernel
         if self.version:
             ret['version'] = self.version
+        if self.role:
+            ret['role'] = self.role
         return ret
 
 

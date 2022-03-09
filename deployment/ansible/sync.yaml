@@ -1,0 +1,8 @@
+---
+- name: Update lab machines
+  hosts: labmachines
+  remote_user: mzr
+
+  tasks:
+  - name: update alternative
+    command: update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-11 40
