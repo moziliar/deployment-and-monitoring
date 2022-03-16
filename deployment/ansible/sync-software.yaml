@@ -8,6 +8,7 @@
     snap:
       name: go
       classic: yes
+
   - name: Ensure clang-11 is at the latest version
     ansible.builtin.apt:
       name: clang-11

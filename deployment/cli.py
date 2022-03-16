@@ -1,3 +1,4 @@
+import subprocess
 import os
 
 import click
@@ -10,8 +11,14 @@ from usergroup import UserList, user_list
 
 load_dotenv()
 
+token = ''
+
 
 def setup():
+    # Obtain munge token
+    token_proc = subprocess.run(['munge', '-n'], capture_output=True)
+    token = token_proc.stdout.decode('utf-8')
+
     import rpyc
     c = rpyc.connect(os.environ["DEPLOYMENT_SERVER"], 18861, config = {"allow_public_attrs" : True})
     return c
@@ -40,7 +47,7 @@ def init(force):
 
     # RPC call to centralized server
     server = setup()
-    server.root.init(machine_list_data, software_list_data, user_list_data)
+    server.root.init(token, machine_list_data, software_list_data, user_list_data)
 
 
 @click.command()
@@ -53,7 +60,7 @@ def sync(force):
 
     # RPC call to centralized server
     server = setup()
-    server.root.sync(machine_list_data, software_list_data, user_list_data)
+    server.root.sync(token, machine_list_data, software_list_data, user_list_data)
 
 
 if __name__ == '__main__':

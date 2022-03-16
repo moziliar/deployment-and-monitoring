@@ -9,10 +9,14 @@ from usergroup import user_list
 
 class DeploymentService(rpyc.Service):
     def on_connect(self, conn):
-        return super().on_connect(conn)
+        self.conn = conn
 
     def on_disconnect(self, conn):
-        return super().on_disconnect(conn)
+        pass
+
+    def verify_user(self, token):
+        verify_token_proc = subprocess.run(['unmunge', token], capture_output=True)
+        print(verify_token_proc.stdout.decode('utf-8'))
 
     def setup(self, machine_list_data, software_list_data, user_list_data):
         print("setting", machine_list_data)
@@ -23,7 +27,7 @@ class DeploymentService(rpyc.Service):
         user_list.load_yaml(dict(user_list_data))
         print("set up user")
     
-    def exposed_init(self, machine_list_data, software_list_data, user_list_data):
+    def exposed_init(self, token, machine_list_data, software_list_data, user_list_data):
         self.setup(machine_list_data, software_list_data, user_list_data)
         machine_list.inspect_all()
         software_list.inspect_all_on_machines(machine_list.machines.keys())
@@ -31,7 +35,7 @@ class DeploymentService(rpyc.Service):
 
         report.save_to_yaml()
 
-    def exposed_sync(self, machine_list_data, software_list_data, user_list_data):
+    def exposed_sync(self, token, machine_list_data, software_list_data, user_list_data):
         self.setup(machine_list_data, software_list_data, user_list_data)
         print('serving')
 
