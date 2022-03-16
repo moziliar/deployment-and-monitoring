@@ -16,8 +16,9 @@ token = ''
 
 def setup():
     # Obtain munge token
+    global token
     token_proc = subprocess.run(['munge', '-n'], capture_output=True)
-    token = token_proc.stdout.decode('utf-8')
+    token = token_proc.stdout
 
     import rpyc
     c = rpyc.connect(os.environ["DEPLOYMENT_SERVER"], 18861, config = {"allow_public_attrs" : True})
@@ -60,7 +61,10 @@ def sync(force):
 
     # RPC call to centralized server
     server = setup()
-    server.root.sync(token, machine_list_data, software_list_data, user_list_data)
+    try:
+        server.root.sync(token, machine_list_data, software_list_data, user_list_data)
+    except Exception as err:
+        print(err)
 
 
 if __name__ == '__main__':

@@ -15,8 +15,11 @@ class DeploymentService(rpyc.Service):
         pass
 
     def verify_user(self, token):
-        verify_token_proc = subprocess.run(['unmunge', token], capture_output=True)
-        print(verify_token_proc.stdout.decode('utf-8'))
+        verify_token_proc = subprocess.run(['unmunge'], input=token, capture_output=True)
+        for line in verify_token_proc.stdout.decode('utf-8').splitlines():
+            if line.startswith('GID') and 'sudo' in line:
+                return
+        raise Exception('non-sudo user')
 
     def setup(self, machine_list_data, software_list_data, user_list_data):
         print("setting", machine_list_data)
@@ -28,6 +31,7 @@ class DeploymentService(rpyc.Service):
         print("set up user")
     
     def exposed_init(self, token, machine_list_data, software_list_data, user_list_data):
+        self.verify_user(token)
         self.setup(machine_list_data, software_list_data, user_list_data)
         machine_list.inspect_all()
         software_list.inspect_all_on_machines(machine_list.machines.keys())
@@ -36,6 +40,9 @@ class DeploymentService(rpyc.Service):
         report.save_to_yaml()
 
     def exposed_sync(self, token, machine_list_data, software_list_data, user_list_data):
+        if not self.verify_user(token):
+            return
+        self.verify_user(token)
         self.setup(machine_list_data, software_list_data, user_list_data)
         print('serving')
 
