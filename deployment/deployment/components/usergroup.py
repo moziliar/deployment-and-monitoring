@@ -1,11 +1,10 @@
 from collections import defaultdict
-from email.policy import default
+from components import templates
 
-import ssh
-import basedata
-import templates
+from components.basedata import Data, DataEntity
 
-class UserList(basedata.Data):
+
+class UserList(Data):
     def __init__(self):
         super().__init__()
         self.user_groups = {}
@@ -39,7 +38,7 @@ class UserList(basedata.Data):
         )
 
 
-class UserGroup(basedata.DataEntity):
+class UserGroup(DataEntity):
     def __init__(self, name):
         super().__init__(name)
         self.users = {}
@@ -53,7 +52,7 @@ class UserGroup(basedata.DataEntity):
             ug.users = {}
         ug.users = {name: User(name=name, group=ug.name) for name in ug.users}
         return ug
-    
+
     def to_dict(self):
         ret = {'users': {}}
         for user, machines in self.user_to_machines.items():
@@ -67,7 +66,8 @@ class UserGroup(basedata.DataEntity):
     def inspect_on_machines(self, machines):
         self.machine_set = set(machines)
         for machine in machines:
-            output, success = ssh.client.exec_on_machine(machine, f"id=$(getent group {self.name} | cut -d: -f3); echo $id | awk -v id=$id -F: '{{if ($4 == id) {{print $0}}}}' /etc/passwd")
+            output, success = ssh.client.exec_on_machine(machine,
+                                                         f"id=$(getent group {self.name} | cut -d: -f3); echo $id | awk -v id=$id -F: '{{if ($4 == id) {{print $0}}}}' /etc/passwd")
             if not success:
                 print(f'exec on {machine} failed')
                 continue
@@ -85,7 +85,8 @@ class UserGroup(basedata.DataEntity):
 
         # Inspect existing users on the machines
         for machine in machines:
-            output, success = ssh.client.exec_on_machine(machine, f"id=$(getent group {self.name} | cut -d: -f3); echo $id | awk -v id=$id -F: '{{if ($4 == id) {{print $0}}}}' /etc/passwd")
+            output, success = ssh.client.exec_on_machine(machine,
+                                                         f"id=$(getent group {self.name} | cut -d: -f3); echo $id | awk -v id=$id -F: '{{if ($4 == id) {{print $0}}}}' /etc/passwd")
             if not success:
                 continue
             users = output.stdout.split('\n')
@@ -103,7 +104,7 @@ class UserGroup(basedata.DataEntity):
             diff = set(machines) - set(remote_user_to_machines.get(user))
             if len(diff) > 0:
                 users_to_add[user] = diff
-        
+
         # Inspect extra users
         for user, remote_machines in remote_user_to_machines.items():
             if user not in self.user_to_machines:
@@ -119,6 +120,7 @@ class UserGroup(basedata.DataEntity):
     def sync_users(self, users_to_add, users_to_remove):
         # Generate ansible playbook to perform operation
         print(templates.get_sync_user_play(users_to_add, users_to_remove))
+
 
 class User(object):
     def __init__(self, name, group, uid=0, gid=0, homedir=None, shell=None):

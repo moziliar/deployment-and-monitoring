@@ -4,10 +4,9 @@ import os
 import click
 from dotenv import load_dotenv
 
-from machine import MachineList, machine_list, MachineCannotSyncException
-from report import report
-from software import SoftwareList, software_list
-from usergroup import UserList, user_list
+from components.machine import MachineList
+from components.software import SoftwareList
+from components.usergroup import UserList
 
 load_dotenv()
 
@@ -26,9 +25,9 @@ def setup():
 
 
 def load_yaml():
-    machine_list_data = MachineList.open_yaml('machine-list.yaml')
-    software_list_data = SoftwareList.open_yaml('software-list.yaml')
-    user_list_data = UserList.open_yaml('user-list.yaml')
+    machine_list_data = MachineList.open_yaml('resources/machine-list.yaml')
+    software_list_data = SoftwareList.open_yaml('resources/software-list.yaml')
+    user_list_data = UserList.open_yaml('resources/user-list.yaml')
 
     return machine_list_data, software_list_data, user_list_data
 

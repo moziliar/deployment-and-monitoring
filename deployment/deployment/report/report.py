@@ -24,7 +24,7 @@ class Report(object):
         self.diff[entry_type].append(entry)
 
     def save_to_yaml(self):
-        report_path = os.path.join(os.getenv("PWD"), 'report.yaml')
+        report_path = os.path.join(os.getenv("PWD"), '../resources/report.yaml')
         print(f'generate report at {report_path}')
         with open(report_path, 'w') as f:
             report_dict = {'diff': dict(self.diff)}

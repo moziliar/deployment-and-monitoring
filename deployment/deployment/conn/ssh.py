@@ -2,7 +2,6 @@ import logging
 import os
 
 import paramiko
-from paramiko import util
 from configs import config
 
 port = 22

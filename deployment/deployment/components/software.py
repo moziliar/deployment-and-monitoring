@@ -1,13 +1,10 @@
 from collections import defaultdict
+from components import templates
 
-import yaml
-
-import ssh
-import basedata
-import templates
+from components.basedata import Data, DataEntity
 
 
-class SoftwareList(basedata.Data):
+class SoftwareList(Data):
     def __init__(self):
         super().__init__()
         self.softwares = {}
@@ -37,7 +34,7 @@ class SoftwareList(basedata.Data):
         )
 
 
-class Software(basedata.DataEntity):
+class Software(DataEntity):
     def __init__(self, name, version='latest', package=''):
         super().__init__(name)
         self.version = version

@@ -1,12 +1,12 @@
-bin
+venv
 lib
 log
 include
 **/__pycache__
 
 .env
-machine-list.yaml
-software-list.yaml
-user-list.yaml
+deployment/resources/machine-list.yaml
+deployment/resources/software-list.yaml
+deployment/resources/user-list.yaml
 pyvenv.cfg
 play.yaml

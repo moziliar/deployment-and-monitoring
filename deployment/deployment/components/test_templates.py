@@ -1,9 +1,10 @@
 import unittest
 import yaml
-
 import templates
+
 from usergroup import User
 from software import Software
+
 
 class AnsibleUserTestCase(unittest.TestCase):
     def setUp(self):
@@ -14,20 +15,20 @@ class AnsibleUserTestCase(unittest.TestCase):
 
     def test_get_add_user_task(self):
         self.assertEqual(
-            to_yaml_str(templates.get_add_user_task('test1', 'tg')), 
-"""user:
+            to_yaml_str(templates.get_add_user_task('test1', 'tg')),
+            """user:
   group: tg
   name: test1
   shell: /bin/bash
   umask: '077'
 name: add user test1
-""", 
+""",
             'wrong task for add user')
-    
+
     def test_get_remove_user_task(self):
         self.assertEqual(
-            to_yaml_str(templates.get_remove_user_task('test1', 'tg')), 
-"""user:
+            to_yaml_str(templates.get_remove_user_task('test1', 'tg')),
+            """user:
   group: tg
   name: test1
   remove: true
@@ -35,7 +36,7 @@ name: add user test1
   state: absent
   umask: '077'
 name: remove user test1
-""", 
+""",
             'wrong task for remove user')
 
     def test_get_sync_user_play(self):
@@ -52,8 +53,8 @@ name: remove user test1
         ]
 
         self.assertEqual(
-            to_yaml_str(templates.get_sync_user_play(hosts, remote_user, users_to_add, users_to_remove)), 
-"""hosts: test-cluster
+            to_yaml_str(templates.get_sync_user_play(hosts, remote_user, users_to_add, users_to_remove)),
+            """hosts: test-cluster
 name: Update lab machines
 remote_user: admin
 tasks:
@@ -103,17 +104,17 @@ tasks:
   name: expire user test2 password to update upon first login
 - command: chage -d 0 test3
   name: expire user test3 password to update upon first login
-""", 
+""",
             'wrong play for user sync')
 
     def test_get_install_software_task(self):
         self.assertEqual(
-            to_yaml_str(templates.get_install_software('gcc')), 
-"""apt:
+            to_yaml_str(templates.get_install_software('gcc')),
+            """apt:
   name: gcc
   state: latest
 name: Ensure gcc is installed and at the latest version
-""", 
+""",
             'wrong task for software install')
 
     def test_get_sync_user_play(self):
@@ -125,8 +126,8 @@ name: Ensure gcc is installed and at the latest version
         ]
 
         self.assertEqual(
-            to_yaml_str(templates.get_sync_software_play(hosts, remote_user, softwares_to_install)), 
-"""hosts: test-cluster
+            to_yaml_str(templates.get_sync_software_play(hosts, remote_user, softwares_to_install)),
+            """hosts: test-cluster
 name: Update lab machines
 remote_user: admin
 tasks:
@@ -139,6 +140,7 @@ tasks:
     state: latest
   name: Ensure test-software is installed and at the latest version
 """)
+
 
 def to_yaml_str(json_str):
     return yaml.dump(json_str)

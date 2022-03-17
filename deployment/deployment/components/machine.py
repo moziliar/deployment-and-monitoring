@@ -1,15 +1,10 @@
-from email.mime import base
 from enum import Enum
-import os
-
-import yaml
 from typing import Dict, Set
 
-import ssh
-from report import report
-import basedata
+from components.basedata import Data, DataEntity
 
-class MachineList(basedata.Data):
+
+class MachineList(Data):
     def __init__(self):
         super().__init__()
         self.machines: Dict[str, Machine] = {}
@@ -51,7 +46,7 @@ class MachineCannotSyncException(Exception):
     pass
 
 
-class Machine(basedata.DataEntity):
+class Machine(DataEntity):
     dynamic_fields: Set[str] = {'status'}
     static_fields: Set[str] = {
         'name',
