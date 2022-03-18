@@ -5,6 +5,7 @@ import click
 import rpyc
 from dotenv import load_dotenv
 
+import utils.file
 from components.machine import MachineList
 from components.software import SoftwareList
 from components.usergroup import UserList
@@ -29,9 +30,11 @@ def setup():
 
 
 class ClientService(rpyc.Service):
-    def exposed_save_data_to_path(self, data, path):
-        from utils import file
-        file.save_yaml_data_to_path(data, path)
+    def exposed_save_yaml(self, machine_list_data, software_list_data, user_list_data):
+        from utils.file import save_yaml_data_to_path
+        save_yaml_data_to_path(machine_list_data, 'resources/machine-list.yaml')
+        save_yaml_data_to_path(software_list_data, 'resources/software-list.yaml')
+        save_yaml_data_to_path(user_list_data, 'resources/user-list.yaml')
 
 
 def load_yaml():

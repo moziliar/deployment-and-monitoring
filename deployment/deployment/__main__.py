@@ -38,9 +38,11 @@ class DeploymentService(rpyc.Service):
         user_list.inspect_all_on_machines(machine_list.machines.keys())
 
         # Write back at client side
-        self.conn.root.save_data_to_path(machine_list.get_data(), machine_list.filepath)
-        self.conn.root.save_data_to_path(user_list.get_data(), machine_list.filepath)
-        self.conn.root.save_data_to_path(software_list.get_data(), machine_list.filepath)
+        self.conn.root.save_yaml(
+            machine_list.get_data(),
+            software_list.get_data(),
+            user_list.get_data()
+        )
 
         report.save_to_yaml()
 
