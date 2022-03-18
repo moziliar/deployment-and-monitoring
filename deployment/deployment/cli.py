@@ -2,6 +2,7 @@ import subprocess
 import os
 
 import click
+import rpyc
 from dotenv import load_dotenv
 
 from components.machine import MachineList
@@ -19,9 +20,18 @@ def setup():
     token_proc = subprocess.run(['munge', '-n'], capture_output=True)
     token = token_proc.stdout
 
-    import rpyc
-    c = rpyc.connect(os.environ["DEPLOYMENT_SERVER"], 18861, config={"allow_public_attrs": True})
+    c = rpyc.connect(
+        os.environ["DEPLOYMENT_SERVER"], 18861,
+        config={"allow_public_attrs": True},
+        service=ClientService,
+    )
     return c
+
+
+class ClientService(rpyc.Service):
+    def exposed_save_data_to_path(self, data, path):
+        from utils import file
+        file.save_yaml_data_to_path(data, path)
 
 
 def load_yaml():

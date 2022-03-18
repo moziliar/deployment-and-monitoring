@@ -28,13 +28,6 @@ class Data(object):
     def get_data(self):
         pass
 
-    def write_back(self):
-        with open(self.filepath, 'w') as f:
-            data_dict = {}
-            for data_entry in self.get_data().values():
-                data_dict[data_entry.name] = data_entry.to_dict()
-            yaml.safe_dump(data_dict, f, default_flow_style=False)
-
 
 class DataEntity(object):
     def __init__(self, name):
