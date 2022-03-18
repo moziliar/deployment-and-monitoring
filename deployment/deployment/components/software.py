@@ -1,7 +1,8 @@
 from collections import defaultdict
-from components import templates
 
+from components import templates
 from components.basedata import Data, DataEntity
+from conn import ssh
 
 
 class SoftwareList(Data):
