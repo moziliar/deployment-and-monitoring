@@ -20,7 +20,7 @@ def setup():
     token = token_proc.stdout
 
     import rpyc
-    c = rpyc.connect(os.environ["DEPLOYMENT_SERVER"], 18861, config = {"allow_public_attrs" : True})
+    c = rpyc.connect(os.environ["DEPLOYMENT_SERVER"], 18861, config={"allow_public_attrs": True})
     return c
 
 

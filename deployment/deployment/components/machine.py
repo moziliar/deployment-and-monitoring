@@ -2,6 +2,7 @@ from enum import Enum
 from typing import Dict, Set
 
 from components.basedata import Data, DataEntity
+from conn import ssh
 
 
 class MachineList(Data):
@@ -24,7 +25,6 @@ class MachineList(Data):
         for machine in self.machines.values():
             print(f'inspecting machine {machine.name}')
             machine.inspect()
-        self.write_back()
 
     def introspect(self):
         print('introspecting machines in files')

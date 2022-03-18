@@ -20,7 +20,6 @@ class UserList(Data):
         for user_group in self.user_groups.values():
             print(f'inspecting usergroup {user_group.name}')
             user_group.inspect_on_machines(machines)
-        self.write_back()
 
     def diff_all_on_machines(self, machines):
         print('check difference in software on machines')

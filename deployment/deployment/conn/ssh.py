@@ -19,21 +19,23 @@ class SSH(object):
     def setup_connection_to_host(self, hostname):
         if hostname in self.ssh_conns:
             return None
-        conf = paramiko.SSHConfig()
-        conf.parse(open(os.path.expanduser('~/.ssh/config')))
-        host = conf.lookup(hostname)
+        # conf = paramiko.SSHConfig()
+        # conf.parse(open(os.path.expanduser('~/.ssh/config')))
+        # host = conf.lookup(hostname)
 
         client = paramiko.SSHClient()
         client.load_system_host_keys()
         client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 
-        key = paramiko.RSAKey.from_private_key_file(config.defaultSSHKeyPath, password=os.getenv("SSH_PASSWORD"))
+        # key = paramiko.RSAKey.from_private_key_file(config.defaultSSHKeyPath, password=os.getenv("SSH_PASSWORD"))
         client.connect(
-            hostname=host['hostname'],
-            username=os.getenv("SSH_USER"),
-            pkey=key,
-            sock=paramiko.ProxyCommand(host.get('proxycommand')),
-            timeout=1,
+            # hostname=host['hostname'],
+            hostname=hostname,
+            username=os.getenv('SSH_USER'),
+            password=os.getenv('SSH_PASSWORD'),
+            # pkey=key,
+            # sock=paramiko.ProxyCommand(host.get('proxycommand')),
+            timeout=5,
         )
 
         self.ssh_conns[hostname] = client

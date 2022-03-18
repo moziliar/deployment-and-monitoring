@@ -20,7 +20,6 @@ class SoftwareList(Data):
         for software in self.softwares.values():
             print(f'inspecting software {software.name}')
             software.inspect_on_machines(machines)
-        self.write_back()
 
     def diff_all_on_machines(self, machines):
         print('check difference in software on machines')

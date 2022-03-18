@@ -1,10 +1,14 @@
 import rpyc
+from dotenv import load_dotenv
+
 from components.machine import machine_list, MachineCannotSyncException
 from components.software import software_list
 from components.usergroup import user_list
 from report.report import report
 from utils.token import verify_user
 from utils.run import dump_to_playbook_at, run_ansible_at
+
+load_dotenv()
 
 
 def setup(machine_list_data, software_list_data, user_list_data):
@@ -18,6 +22,9 @@ def setup(machine_list_data, software_list_data, user_list_data):
 
 
 class DeploymentService(rpyc.Service):
+    def __init__(self):
+        self.conn = None
+
     def on_connect(self, conn):
         self.conn = conn
 
@@ -29,6 +36,11 @@ class DeploymentService(rpyc.Service):
         machine_list.inspect_all()
         software_list.inspect_all_on_machines(machine_list.machines.keys())
         user_list.inspect_all_on_machines(machine_list.machines.keys())
+
+        # Write back at client side
+        self.conn.root.machine_list.write_back()
+        self.conn.root.software_list.write_back()
+        self.conn.root.user_list.write_back()
 
         report.save_to_yaml()
 
