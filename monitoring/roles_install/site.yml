@@ -1,0 +1,43 @@
+---
+- name: Install node_exporter on all labmachines
+  hosts: labmachines
+  roles:
+  - cloudalchemy.node_exporter
+
+- name: Install prometheus on nodes
+  hosts: prometheus
+  roles:
+  - cloudalchemy.prometheus
+  vars:
+    prometheus_targets:
+      node:
+      - targets: "{{ groups['labmachines'] | map('regex_replace', '$', ':9100') | list }}"
+    prometheus_scrape_configs:
+      - job_name: "prometheus"
+        metrics_path: "/metrics"
+        static_configs:
+          - targets:
+              - "{{ ansible_host }}:9090"
+      - job_name: "node"
+        file_sd_configs:
+          - files:
+              - "/etc/prometheus/file_sd/node.yml"
+
+- name: Install Grafana on nodes
+  hosts: grafana
+  roles:
+  - cloudalchemy.grafana
+  vars:
+    grafana_security:
+      admin_user: admin
+      admin_password: admin
+    grafana_datasources:
+      - name: "Prometheus"
+        type: "prometheus"
+        access: "proxy"
+        url: "http://{{ ansible_host }}:9090"
+        isDefault: true
+    grafana_dashboards:
+      - dashboard_id: '1860'
+        revision_id: '12'
+        datasource: '{{ grafana_datasources.0.name }}'

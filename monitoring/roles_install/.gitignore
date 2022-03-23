@@ -1,0 +1,3 @@
+venv
+roles/*
+!roles/requirements.yml
