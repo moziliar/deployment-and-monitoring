@@ -5,4 +5,4 @@
 
   tasks:
   - name: update alternative
-    command: update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-11 40
+    command: rm /usr/local/bin/node_exporter

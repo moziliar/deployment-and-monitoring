@@ -23,7 +23,10 @@ def setup():
 
     c = rpyc.connect(
         os.environ["DEPLOYMENT_SERVER"], 18861,
-        config={"allow_public_attrs": True},
+        config={
+            "allow_pickle": True,
+            "allow_public_attrs": True
+        },
         service=ClientService,
     )
     return c

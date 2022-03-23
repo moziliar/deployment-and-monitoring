@@ -58,7 +58,7 @@ class UserGroup(DataEntity):
         for user, machines in self.user_to_machines.items():
             missing_on_machines = self.machine_set - set(machines)
             if len(missing_on_machines) != 0:
-                ret['users'][user] = {'missing on': list(missing_on_machines)}
+                ret['users'][user] = dict({'missing on': list(missing_on_machines)})
             else:
                 ret['users'][user] = None
         return ret

@@ -18,7 +18,6 @@ class Data(object):
     def load_yaml(self, data):
         if not data:
             return
-        print(dict(data))
         for name, attr in data.items():
             self.load_object(name, attr)
 

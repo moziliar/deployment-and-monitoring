@@ -13,11 +13,11 @@ load_dotenv()
 
 def setup(machine_list_data, software_list_data, user_list_data):
     print("setting", machine_list_data)
-    machine_list.load_yaml(dict(machine_list_data))
+    machine_list.load_yaml(machine_list_data)
     print("set up machine")
-    software_list.load_yaml(dict(software_list_data))
+    software_list.load_yaml(software_list_data)
     print("set up soft")
-    user_list.load_yaml(dict(user_list_data))
+    user_list.load_yaml(user_list_data)
     print("set up user")
 
 
@@ -26,13 +26,20 @@ class DeploymentService(rpyc.Service):
         self.conn = None
 
     def on_connect(self, conn):
-        self.conn = conn
+        if self.conn is None:
+            self.conn = conn
+        else:
+            raise Exception('someone is provisioning the machines')
 
     def on_disconnect(self, conn):
-        pass
+        self.conn = None
 
     def exposed_init(self, token, machine_list_data, software_list_data, user_list_data):
-        setup(machine_list_data, software_list_data, user_list_data)
+        setup(
+            rpyc.classic.obtain(machine_list_data),
+            rpyc.classic.obtain(software_list_data),
+            rpyc.classic.obtain(user_list_data)
+        )
         machine_list.inspect_all()
         software_list.inspect_all_on_machines(machine_list.machines.keys())
         user_list.inspect_all_on_machines(machine_list.machines.keys())
@@ -44,13 +51,15 @@ class DeploymentService(rpyc.Service):
             user_list.get_data()
         )
 
-        report.save_to_yaml()
-
     def exposed_sync(self, token, machine_list_data, software_list_data, user_list_data):
         if not verify_user(token):
             return
         verify_user(token)
-        setup(machine_list_data, software_list_data, user_list_data)
+        setup(
+            rpyc.classic.obtain(machine_list_data),
+            rpyc.classic.obtain(software_list_data),
+            rpyc.classic.obtain(user_list_data)
+        )
         print('serving')
 
         try:
@@ -75,5 +84,12 @@ class DeploymentService(rpyc.Service):
 
 if __name__ == "__main__":
     from rpyc.utils.server import ThreadedServer
-    t = ThreadedServer(DeploymentService, port=18861, protocol_config = {"allow_public_attrs" : True})
+
+    t = ThreadedServer(
+        DeploymentService, port=18861,
+        protocol_config={
+            "allow_pickle": True,
+            "allow_public_attrs": True
+        }
+    )
     t.start()
