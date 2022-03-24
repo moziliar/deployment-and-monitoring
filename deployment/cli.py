@@ -5,7 +5,6 @@ import click
 import rpyc
 from dotenv import load_dotenv
 
-import utils.file
 from components.machine import MachineList
 from components.software import SoftwareList
 from components.usergroup import UserList

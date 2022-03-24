@@ -1,0 +1,8 @@
+---
+- name: Update lab machines
+  hosts: labmachines
+  remote_user: mzr
+
+  tasks:
+  - name: update alternative
+    command: rm /usr/local/bin/node_exporter

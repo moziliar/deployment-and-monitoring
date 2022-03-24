@@ -1,0 +1,70 @@
+---
+- name: Update lab machines
+  hosts: labmachines
+  remote_user: mzr
+
+  tasks:
+  - name: Ensure rust is at the latest version
+    command: curl --proto '=https' --tlsv1.2 -sSf -y https://sh.rustup.rs | sh
+    args:
+      stdin: "1"
+
+  - name: Ensure go is at the latest version
+    snap:
+      name: go
+      classic: yes
+
+  - name: Ensure clang-11 is at the latest version
+    ansible.builtin.apt:
+      name: clang-11
+      state: latest
+
+  - name: Ensure clang-12 is at the latest version
+    ansible.builtin.apt:
+      name: clang-12
+      state: latest
+
+  - name: Ensure libc++-11-dev is at the latest version
+    ansible.builtin.apt:
+      name: libc++-11-dev
+      state: latest
+
+  - name: Ensure libc++-abi-11-dev is at the latest version
+    ansible.builtin.apt:
+      name: libc++abi-11-dev      
+      state: latest
+
+  - name: Ensure htop is at the latest version
+    ansible.builtin.apt:
+      name: htop
+      state: latest
+
+  - name: Ensure tmux is at the latest version
+    ansible.builtin.apt:
+      name: tmux
+      state: latest
+
+  - name: Ensure curl is at the latest version
+    ansible.builtin.apt:
+      name: curl
+      state: latest
+
+  - name: Ensure valgrind is at the latest version
+    ansible.builtin.apt:
+      name: valgrind
+      state: latest
+
+  - name: Ensure lm-sensors is at the latest version
+    ansible.builtin.apt:
+      name: lm-sensors
+      state: latest
+
+  - name: Ensure hwloc is at the latest version
+    ansible.builtin.apt:
+      name: hwloc
+      state: latest
+
+  - name: Ensure pkg-config is at the latest version
+    ansible.builtin.apt:
+      name: pkg-config
+      state: latest

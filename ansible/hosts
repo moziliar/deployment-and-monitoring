@@ -1,0 +1,9 @@
+[labmachines]
+#soctf-pdc-001
+soctf-pdc-0[01:16]
+soctf-pdc-0[18:24]
+
+
+[production]
+10.84.213.99
+10.84.213.100

@@ -1,8 +1,8 @@
 from enum import Enum
 from typing import Dict, Set
 
-from components.basedata import Data, DataEntity
-from conn import ssh
+from basedata import Data, DataEntity
+from deployment.conn import ssh
 
 
 class MachineList(Data):
