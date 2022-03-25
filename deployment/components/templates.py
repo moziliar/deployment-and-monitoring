@@ -42,10 +42,10 @@ def get_sync_user_play(all_hosts, remote_user, users_to_add, users_to_remove):
     # Find common hosts
     host_group_user_map = defaultdict(lambda: [[], []])
     for user_to_add, target_machines in users_to_add.items():
-        host_group_user_map[0][target_machines] += user_to_add
+        host_group_user_map[tuple(target_machines)][0].append(user_to_add)
 
     for user_to_remove, target_machines in users_to_add.items():
-        host_group_user_map[1][target_machines] += user_to_remove
+        host_group_user_map[tuple(target_machines)][1].append(user_to_remove)
 
     new_book = []
 
@@ -61,8 +61,10 @@ def get_sync_user_play(all_hosts, remote_user, users_to_add, users_to_remove):
         new_play['tasks'] += map(lambda u: get_remove_user_password(u.name), users_to_add)
         new_play['tasks'] += map(lambda u: get_expire_user_password(u.name), users_to_add)
 
-        new_book += new_play
+        print(new_play)
+        new_book.append(new_play)
 
+    print(new_book)
     return new_book
 
 
@@ -83,7 +85,7 @@ def get_add_user_task(name, group):
 def get_remove_user_task(name, group):
     return {
         'name': f'remove user {name}',
-        'user': get_user_info(name, group) | _remove_user_suffix
+        'user': {**get_user_info(name, group), **_remove_user_suffix}
     }
 
 

@@ -24,12 +24,14 @@ class UserList(Data):
 
     def diff_all_on_machines(self, machines):
         print('check difference in software on machines')
-        users_to_add, users_to_remove = [], []
+        users_to_add, users_to_remove = defaultdict(list), defaultdict(list)
         for user_group in self.user_groups.values():
             print(f'inspecting user_group {user_group.name}')
-            _users_to_add, _users_to_remove = user_group.diff_on_machines(machines)
-            users_to_add += _users_to_add
-            users_to_remove += _users_to_remove
+            users_to_add_for_group, users_to_remove_for_group = user_group.diff_on_machines(machines)
+            for user, machines in users_to_add_for_group.items():
+                users_to_add[user] += machines
+            for user, machines in users_to_remove_for_group.items():
+                users_to_remove[user] += machines
         return templates.get_sync_user_play(
             machines,
             'mzr',
@@ -85,21 +87,21 @@ class UserGroup(DataEntity):
         # Inspect missing users
         for user, _ in self.users.items():
             if user not in self.remote_user_to_machines:
-                users_to_add[user] = machines
+                users_to_add[self.users[user]] = machines
                 continue
             diff = set(machines) - set(self.remote_user_to_machines.get(user))
             if diff:
-                users_to_add[user] = diff
+                users_to_add[self.users[user]] = diff
 
         # Inspect extra users
         for user, remote_machines in self.remote_user_to_machines.items():
             if user not in self.remote_user_to_machines:
                 # Add user
-                users_to_remove[user] = remote_machines
+                users_to_remove[self.users[user]] = remote_machines
                 continue
             diff = set(remote_machines) - set(machines)
             if diff:
-                users_to_remove[user] = diff
+                users_to_remove[self.users[user]] = diff
 
         return users_to_add, users_to_remove
 
