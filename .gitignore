@@ -1,4 +1,4 @@
-./idea
+.idea
 venv
 log
 **/__pycache__
