@@ -1,0 +1,4 @@
+resources
+
+!resources/monitoring/site.yaml
+!resources/monitoring/roles/requirements.yaml

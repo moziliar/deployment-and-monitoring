@@ -8,3 +8,16 @@ def save_yaml_data_to_path(data, filepath):
         for data_entry in data.values():
             data_dict[data_entry.name] = rpyc.classic.obtain(data_entry).to_dict()
         yaml.safe_dump(data_dict, f, default_flow_style=False)
+
+
+def generate_ini_file(host_map):
+    from configparser import ConfigParser
+    config = ConfigParser(allow_no_value=True)
+
+    for group, hosts in host_map.items():
+        config.add_section(group)
+        for host in hosts:
+            config.set(group, host)
+
+    with open('resources/monitoring/hosts', 'w') as f:
+        config.write(f)
