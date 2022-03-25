@@ -42,7 +42,7 @@ class UserGroup(DataEntity):
     def __init__(self, name):
         super().__init__(name)
         self.users = {}
-        self.user_to_machines = defaultdict(list)
+        self.remote_user_to_machines = defaultdict(list)
         self.machine_set = set()
 
     @classmethod
@@ -55,7 +55,7 @@ class UserGroup(DataEntity):
 
     def to_dict(self):
         ret = {'users': {}}
-        for user, machines in self.user_to_machines.items():
+        for user, machines in self.remote_user_to_machines.items():
             missing_on_machines = self.machine_set - set(machines)
             if len(missing_on_machines) != 0:
                 ret['users'][user] = dict({'missing on': list(missing_on_machines)})
@@ -74,52 +74,34 @@ class UserGroup(DataEntity):
             users = output.stdout.split('\n')
             for user_str in filter(lambda u: u.strip() != '', users):
                 name, _, uid, gid, _, homedir, shell = user_str.split(':')
-                self.user_to_machines[name].append(machine)
+                self.remote_user_to_machines[name].append(machine)
 
     def diff_on_machines(self, machines):
         users_to_add = {}
         users_to_remove = {}
-        remote_user_to_machines = defaultdict(list)
 
         self.inspect_on_machines(machines)
 
-        # Inspect existing users on the machines
-        for machine in machines:
-            output, success = ssh.client.exec_on_machine(machine,
-                                                         f"id=$(getent group {self.name} | cut -d: -f3); echo $id | awk -v id=$id -F: '{{if ($4 == id) {{print $0}}}}' /etc/passwd")
-            if not success:
-                continue
-            users = output.stdout.split('\n')
-            for user_str in users:
-                if user_str.strip() == '':
-                    continue
-                name, _, uid, gid, _, homedir, shell = user_str.split(':')
-                remote_user_to_machines[name].append(machine)
-
         # Inspect missing users
-        for user, _ in self.user_to_machines.items():
-            if user not in remote_user_to_machines:
+        for user, _ in self.users.items():
+            if user not in self.remote_user_to_machines:
                 users_to_add[user] = machines
                 continue
-            diff = set(machines) - set(remote_user_to_machines.get(user))
-            if len(diff) > 0:
+            diff = set(machines) - set(self.remote_user_to_machines.get(user))
+            if diff:
                 users_to_add[user] = diff
 
         # Inspect extra users
-        for user, remote_machines in remote_user_to_machines.items():
-            if user not in self.user_to_machines:
+        for user, remote_machines in self.remote_user_to_machines.items():
+            if user not in self.remote_user_to_machines:
                 # Add user
                 users_to_remove[user] = remote_machines
                 continue
             diff = set(remote_machines) - set(machines)
-            if len(diff) > 0:
+            if diff:
                 users_to_remove[user] = diff
 
         return users_to_add, users_to_remove
-
-    def sync_users(self, users_to_add, users_to_remove):
-        # Generate ansible playbook to perform operation
-        print(templates.get_sync_user_play(users_to_add, users_to_remove))
 
 
 class User(object):
