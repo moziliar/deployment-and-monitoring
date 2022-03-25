@@ -4,18 +4,26 @@ if [[ ! -f .env ]]; then
   cp .env.template .env
 fi
 
-if [[ ! -d log ]]; then
+if [[ ! -d deployment/log ]]; then
   mkdir log
 fi
 
-if [[ ! -f machine-list.yaml ]]; then
-  touch machine-list.yaml
+if [[ ! -d deployment/resources ]]; then
+  mkdir resources
 fi
 
-if [[ ! -f user-list.yaml ]]; then
-  touch user-list.yaml
+if [[ ! -f deployment/resources/machine-list.yaml ]]; then
+  touch resources/machine-list.yaml
 fi
 
-if [[ ! -f software-list.yaml ]]; then
-  touch software-list.yaml
+if [[ ! -f deployment/resources/user-list.yaml ]]; then
+  touch resources/user-list.yaml
+fi
+
+if [[ ! -f deployment/resources/software-list.yaml ]]; then
+  touch resources/software-list.yaml
+fi
+
+if [[ ! -d /tmp/ansible ]]; then
+  mkdir /tmp/ansible
 fi

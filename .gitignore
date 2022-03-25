@@ -4,6 +4,3 @@ log
 **/__pycache__
 
 .env
-deployment/resources/machine-list.yaml
-deployment/resources/software-list.yaml
-deployment/resources/user-list.yaml

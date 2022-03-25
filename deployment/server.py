@@ -52,9 +52,12 @@ class DeploymentService(rpyc.Service):
         )
 
     def exposed_sync(self, token, machine_list_data, software_list_data, user_list_data):
-        if not verify_user(token):
-            return
-        verify_user(token)
+        try:
+            verify_user(token)
+        except Exception as e:
+            print(e)
+            raise e
+
         setup(
             rpyc.classic.obtain(machine_list_data),
             rpyc.classic.obtain(software_list_data),
