@@ -2,7 +2,7 @@ import logging
 import os
 
 import paramiko
-from deployment.configs import config
+from configs import config
 
 port = 22
 paramiko.util.log_to_file(config.sshLogPath, level=logging.DEBUG)

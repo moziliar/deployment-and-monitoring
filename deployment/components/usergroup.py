@@ -1,8 +1,8 @@
 from collections import defaultdict
 
-import templates
-from basedata import Data, DataEntity
-from deployment.conn import ssh
+from components import templates
+from components.basedata import Data, DataEntity
+from conn import ssh
 
 
 class UserList(Data):
