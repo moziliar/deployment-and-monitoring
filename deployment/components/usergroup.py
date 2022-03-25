@@ -28,10 +28,10 @@ class UserList(Data):
         for user_group in self.user_groups.values():
             print(f'inspecting user_group {user_group.name}')
             _users_to_add, _users_to_remove = user_group.diff_on_machines(machines)
-            users_to_add += [User(name=name, group=user_group.name) for name in _users_to_add.keys()]
-            users_to_remove += [User(name=name, group=user_group.name) for name in _users_to_remove.keys()]
+            users_to_add += _users_to_add
+            users_to_remove += _users_to_remove
         return templates.get_sync_user_play(
-            'labmachines',
+            machines,
             'mzr',
             users_to_add,
             users_to_remove,

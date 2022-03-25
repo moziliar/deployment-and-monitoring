@@ -10,9 +10,9 @@ def save_yaml_data_to_path(data, filepath):
         yaml.safe_dump(data_dict, f, default_flow_style=False)
 
 
-def dump_to_playbook_at(path, data):
+def dump_to_playbook_at(path, playbooks):
     with open(path, 'w+') as f:
-        yaml.dump([data], f)
+        yaml.safe_dump_all(playbooks, f)
 
 
 def generate_ini_file(host_map):

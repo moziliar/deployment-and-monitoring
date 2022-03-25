@@ -1,3 +1,4 @@
+from collections import defaultdict
 from copy import deepcopy
 from string import Template
 
@@ -34,20 +35,35 @@ _remove_user_suffix = {
 }
 
 
-def get_sync_user_play(hosts, remote_user, users_to_add, users_to_remove):
+def get_sync_user_play(all_hosts, remote_user, users_to_add, users_to_remove):
     if not users_to_add and not users_to_remove:
         return None
-    new_play = deepcopy(_sync_user_play)
-    new_play['hosts'] = hosts
-    new_play['remote_user'] = remote_user
 
-    new_play['tasks'] += map(lambda u: get_add_user_task(u.name, u.group), users_to_add)
-    new_play['tasks'] += map(lambda u: get_remove_user_task(u.name, u.group), users_to_remove)
+    # Find common hosts
+    host_group_user_map = defaultdict(lambda: [[], []])
+    for user_to_add, target_machines in users_to_add.items():
+        host_group_user_map[0][target_machines] += user_to_add
 
-    # For new users, remove password and prompt for password change upon first login
-    new_play['tasks'] += map(lambda u: get_remove_user_password(u.name), users_to_add)
-    new_play['tasks'] += map(lambda u: get_expire_user_password(u.name), users_to_add)
-    return new_play
+    for user_to_remove, target_machines in users_to_add.items():
+        host_group_user_map[1][target_machines] += user_to_remove
+
+    new_book = []
+
+    for host_group, [users_to_add, users_to_remove] in host_group_user_map.items():
+        new_play = deepcopy(_sync_user_play)
+        new_play['hosts'] = ','.join(host_group)
+        new_play['remote_user'] = remote_user
+
+        new_play['tasks'] += map(lambda u: get_add_user_task(u.name, u.group), users_to_add)
+        new_play['tasks'] += map(lambda u: get_remove_user_task(u.name, u.group), users_to_remove)
+
+        # For new users, remove password and prompt for password change upon first login
+        new_play['tasks'] += map(lambda u: get_remove_user_password(u.name), users_to_add)
+        new_play['tasks'] += map(lambda u: get_expire_user_password(u.name), users_to_add)
+
+        new_book += new_play
+
+    return new_book
 
 
 def get_user_info(name, group):

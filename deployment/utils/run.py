@@ -1,5 +1,4 @@
 import subprocess
-import yaml
 
 
 def run_ansible_at(path):
@@ -7,7 +6,6 @@ def run_ansible_at(path):
         'ansible-playbook',
         path,
         '-f', '20',
-        '-i', 'ansible/hosts',
         '--become', '-K'
     ], stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
     return sync_user_proc.communicate()
