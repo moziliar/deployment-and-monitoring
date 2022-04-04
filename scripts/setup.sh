@@ -27,3 +27,5 @@ fi
 if [[ ! -d /tmp/ansible ]]; then
   mkdir /tmp/ansible
 fi
+
+# TODO: make ansible-vault using ansible-vault create secrete and make vault.txt file

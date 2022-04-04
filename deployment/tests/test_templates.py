@@ -1,9 +1,9 @@
 import unittest
 import yaml
-import templates
 
-from usergroup import User
-from software import Software
+from components import templates
+from components.usergroup import User
+from components.software import Software
 
 
 class AnsibleUserTestCase(unittest.TestCase):
@@ -16,31 +16,31 @@ class AnsibleUserTestCase(unittest.TestCase):
     def test_get_add_user_task(self):
         self.assertEqual(
             to_yaml_str(templates.get_add_user_task('test1', 'tg')),
-            """user:
+            """name: add user test1
+user:
   group: tg
   name: test1
   shell: /bin/bash
   umask: '077'
-name: add user test1
 """,
             'wrong task for add user')
 
     def test_get_remove_user_task(self):
         self.assertEqual(
             to_yaml_str(templates.get_remove_user_task('test1', 'tg')),
-            """user:
+            """name: remove user test1
+user:
   group: tg
   name: test1
   remove: true
   shell: /bin/bash
   state: absent
   umask: '077'
-name: remove user test1
 """,
             'wrong task for remove user')
 
     def test_get_sync_user_play(self):
-        hosts = 'test-cluster'
+        hosts = 'tests-cluster'
         remote_user = 'admin'
         users_to_add = [
             User(name='test1', group='tg1'),
@@ -54,7 +54,7 @@ name: remove user test1
 
         self.assertEqual(
             to_yaml_str(templates.get_sync_user_play(hosts, remote_user, users_to_add, users_to_remove)),
-            """hosts: test-cluster
+            """hosts: tests-cluster
 name: Update lab machines
 remote_user: admin
 tasks:
@@ -118,16 +118,16 @@ name: Ensure gcc is installed and at the latest version
             'wrong task for software install')
 
     def test_get_sync_user_play(self):
-        hosts = 'test-cluster'
+        hosts = 'tests-cluster'
         remote_user = 'admin'
         softwares_to_install = [
             Software(name='gcc'),
-            Software(name='test-software'),
+            Software(name='tests-software'),
         ]
 
         self.assertEqual(
             to_yaml_str(templates.get_sync_software_play(hosts, remote_user, softwares_to_install)),
-            """hosts: test-cluster
+            """hosts: tests-cluster
 name: Update lab machines
 remote_user: admin
 tasks:
@@ -136,10 +136,11 @@ tasks:
     state: latest
   name: Ensure gcc is installed and at the latest version
 - apt:
-    name: test-software
+    name: tests-software
     state: latest
-  name: Ensure test-software is installed and at the latest version
+  name: Ensure tests-software is installed and at the latest version
 """)
+        print("tests passes")
 
 
 def to_yaml_str(json_str):

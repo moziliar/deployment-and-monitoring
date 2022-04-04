@@ -7,14 +7,14 @@
   - name: Add the user 'test1' with a specific uid and a primary group of 'student'
     ansible.builtin.user:
       name: test1
-      comment: test account
+      comment: tests account
       uid: 1040
       group: student
 
   - name: Remove the user 'test2' with a specific uid and a primary group of 'student'
     ansible.builtin.user:
       name: test2
-      comment: test account to remove
+      comment: tests account to remove
       uid: 1041
       group: student
       state: absent

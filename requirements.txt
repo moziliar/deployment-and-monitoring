@@ -5,3 +5,4 @@ paramiko
 ansible
 rpyc
 jmespath
+fabric
