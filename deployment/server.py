@@ -78,10 +78,10 @@ class DeploymentService(rpyc.Service):
         dump_to_playbook_at('/tmp/ansible/user_play.yaml', user_sync_file)
         dump_to_playbook_at('/tmp/ansible/software_play.yaml', software_sync_file)
 
-        stdout, stderr = run_ansible_at('/tmp/ansible/user_play.yaml')
-        self.conn.root.client_print(stdout.encode('utf-8'))
-        stdout, stderr = run_ansible_at('/tmp/ansible/software_play.yaml')
-        self.conn.root.client_print(stdout.encode('utf-8'))
+        completed_proc = run_ansible_at('/tmp/ansible/user_play.yaml')
+        self.conn.root.client_print(completed_proc.stdout)
+        completed_proc = run_ansible_at('/tmp/ansible/software_play.yaml')
+        self.conn.root.client_print(completed_proc.stdout)
 
         report.save_to_yaml()
 
