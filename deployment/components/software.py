@@ -27,11 +27,12 @@ class SoftwareList(Data):
         for software in self.softwares.values():
             print(f'inspecting software {software.name}')
             software.inspect_on_machines(machines)
-        return templates.get_sync_software_play(
+            print(software)
+        return [templates.get_sync_software_play(
             'labmachines', 
             'mzr',
             list(self.softwares.values())
-        )
+        )]
 
 
 class Software(DataEntity):
