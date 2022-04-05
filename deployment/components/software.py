@@ -52,6 +52,9 @@ class Software(DataEntity):
                 self.machine_to_version[machine] = 'unknown'
                 continue
             ret = output.stdout.strip()
+            if not ret:
+                self.machine_to_version[machine] = 'unknown'
+                continue
             for line in ret.split('\n'):
                 k, v = line.split(':')
                 if k == 'version':

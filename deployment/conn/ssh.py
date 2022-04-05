@@ -23,20 +23,37 @@ class SSH(object):
     def setup_connection_to_host(self, hostname):
         if hostname in self.ssh_conns:
             return None
-        # conf = paramiko.SSHConfig()
-        # conf.parse(open(os.path.expanduser('~/.ssh/config')))
-        # host = conf.lookup(hostname)
+
+        real_hostname = hostname
+
+        username = os.getenv('SSH_USER')
+        password = os.getenv('SSH_PASSWORD')
+        port = 22
+        key_filename = None
+
+        # config override
+        custom_config_path = os.getenv('SSH_CONFIG_PATH')
+        if custom_config_path:
+            conf = paramiko.SSHConfig.from_path(custom_config_path)
+            host = conf.lookup(hostname)
+
+            # override values
+            real_hostname = str(host['hostname'])
+            username = host['user']
+            password = None
+            port = str(host['port'])
+            key_filename = host['identityfile']
 
         ssh_client = paramiko.SSHClient()
         ssh_client.load_system_host_keys()
         ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 
-        # key = paramiko.RSAKey.from_private_key_file(config.defaultSSHKeyPath, password=os.getenv("SSH_PASSWORD"))
         ssh_client.connect(
-            # hostname=host['hostname'],
-            hostname=hostname,
-            username=os.getenv('SSH_USER'),
+            hostname=real_hostname,
+            username=username,
             password=os.getenv('SSH_PASSWORD'),
+            port=port,
+            key_filename=key_filename,
             # pkey=key,
             # sock=paramiko.ProxyCommand(host.get('proxycommand')),
             timeout=5,

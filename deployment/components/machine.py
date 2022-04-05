@@ -15,8 +15,8 @@ class MachineList(Data):
         super().load_yaml(filepath)
 
         print('machines read; try setting up ssh-copy-id on machines')
-        for machine in self.machines.keys():
-            os.system(f'ssh-copy-id {os.getenv("SSH_USER")}@{machine}')
+        # for machine in self.machines.keys():
+            # os.system(f'ssh-copy-id {os.getenv("SSH_USER")}@{machine}')
     
     def load_object(self, name, attr):
         self.machines[name] = Machine.from_yaml(name, attr)

@@ -1,3 +1,5 @@
+import os, os.path
+
 import yaml
 import rpyc
 
@@ -11,6 +13,9 @@ def save_yaml_data_to_path(data, filepath):
 
 
 def dump_to_playbook_at(path, playbooks):
+    if playbooks is None:
+        return
+    os.makedirs(os.path.dirname(path), exist_ok=True)
     with open(path, 'w+') as f:
         yaml.safe_dump_all(playbooks, f)
 
