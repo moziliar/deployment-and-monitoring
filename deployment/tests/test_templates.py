@@ -50,6 +50,7 @@ user:
         users_to_remove = [
             User(name='test4', group='tg3'),
             User(name='test5', group='tg3')
+
         ]
 
         self.assertEqual(
@@ -140,7 +141,6 @@ tasks:
     state: latest
   name: Ensure tests-software is installed and at the latest version
 """)
-        print("tests passes")
 
 
 def to_yaml_str(json_str):

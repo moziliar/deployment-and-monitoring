@@ -56,7 +56,7 @@ class DeploymentService(rpyc.Service):
         try:
             verify_user(token)
         except Exception as e:
-            print(e)
+            self.conn.root.client_print(e)
             raise e
 
         setup(
@@ -64,12 +64,12 @@ class DeploymentService(rpyc.Service):
             rpyc.classic.obtain(software_list_data),
             rpyc.classic.obtain(user_list_data)
         )
-        print('serving')
 
         try:
+            self.conn.root.client_print('introspecting machine information')
             machine_list.introspect()
         except MachineCannotSyncException:
-            print('machines not ready to sync')
+            self.conn.root.client_print('machines not ready to sync')
             return
 
         user_sync_file = user_list.diff_all_on_machines(machine_list.machines.keys())
@@ -79,9 +79,9 @@ class DeploymentService(rpyc.Service):
         dump_to_playbook_at('/tmp/ansible/software_play.yaml', software_sync_file)
 
         stdout, stderr = run_ansible_at('/tmp/ansible/user_play.yaml')
-        print(str(stdout))
+        self.conn.root.client_print(stdout.encode('utf-8'))
         stdout, stderr = run_ansible_at('/tmp/ansible/software_play.yaml')
-        print(str(stdout))
+        self.conn.root.client_print(stdout.encode('utf-8'))
 
         report.save_to_yaml()
 

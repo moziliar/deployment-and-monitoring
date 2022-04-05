@@ -38,6 +38,9 @@ class ClientService(rpyc.Service):
         save_yaml_data_to_path(software_list_data, 'resources/software-list.yaml')
         save_yaml_data_to_path(user_list_data, 'resources/user-list.yaml')
 
+    def exposed_client_print(self, msg):
+        print(msg)
+
 
 def load_yaml():
     machine_list_data = MachineList.open_yaml('resources/machine-list.yaml')
