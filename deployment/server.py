@@ -1,4 +1,5 @@
 import os
+import time
 
 import rpyc
 from dotenv import load_dotenv
@@ -86,11 +87,19 @@ class DeploymentService(rpyc.Service):
         dump_to_playbook_at(os.path.join(playbook_dir, user_play_name), user_sync_file)
         dump_to_playbook_at(os.path.join(playbook_dir, software_play_name), software_sync_file)
 
-        completed_proc = run_ansible_at(playbook_dir, user_play_name)
-        self.conn.root.client_print(completed_proc.stdout)
+        proc = run_ansible_at(playbook_dir, user_play_name)
+        time.sleep(1)
+        while proc.poll() is None:
+            time.sleep(3)
+            self.conn.root.client_print('ansible still running')
+        self.conn.root.client_print(proc.stdout)
 
-        completed_proc = run_ansible_at(playbook_dir, software_play_name)
-        self.conn.root.client_print(completed_proc.stdout)
+        proc = run_ansible_at(playbook_dir, software_play_name)
+        time.sleep(1)
+        while proc.poll() is None:
+            time.sleep(3)
+            self.conn.root.client_print('ansible still running')
+        self.conn.root.client_print(proc.stdout)
 
         report.save_to_yaml()
 

@@ -38,7 +38,7 @@ _remove_user_suffix = {
 def get_sync_user_play(all_hosts, remote_user, users_to_add, users_to_remove):
     # Generate host group in host file
     host_map = {
-        'all': [all_hosts]
+        'all': all_hosts
     }
     if not users_to_add and not users_to_remove:
         return None, host_map
@@ -127,7 +127,7 @@ def get_install_software(software):
         'apt': {
             'name': software,
             'state': 'latest',
-            'update_cache': 'yes',
+            'update_cache': True,
         }
     }
 
@@ -137,9 +137,9 @@ def get_sync_software_play(hosts, remote_user, softwares_to_install):
         return None
     print(softwares_to_install)
     new_play = deepcopy(_sync_software_play)
-    new_play['hosts'] = 'all' # sync software to all machines
+    new_play['hosts'] = 'all'  # sync software to all machines
     new_play['remote_user'] = remote_user
 
     new_play['tasks'] += map(lambda s: get_install_software(s.name), softwares_to_install)
     print(new_play)
-    return new_play
+    return [new_play]

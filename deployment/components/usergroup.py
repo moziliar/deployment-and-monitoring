@@ -1,3 +1,4 @@
+import os
 from collections import defaultdict
 
 from components import templates
@@ -34,7 +35,7 @@ class UserList(Data):
                 users_to_remove[user] += machines
         return templates.get_sync_user_play(
             machines,
-            'mzr',
+            os.getenv('SSH_USER'),
             users_to_add,
             users_to_remove,
         )

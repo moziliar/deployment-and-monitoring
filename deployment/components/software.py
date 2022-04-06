@@ -1,3 +1,4 @@
+import os
 from collections import defaultdict
 
 from components import templates
@@ -30,7 +31,7 @@ class SoftwareList(Data):
             print(software)
         return [templates.get_sync_software_play(
             'labmachines', 
-            'mzr',
+            os.getenv('SSH_USER'),
             list(self.softwares.values())
         )]
 

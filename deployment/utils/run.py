@@ -3,7 +3,7 @@ import subprocess
 
 
 def run_ansible_at(path, playbook):
-    return subprocess.run([
+    return subprocess.Popen([
         'ansible-playbook',
         os.path.join(path, playbook),
         '-i', os.path.join(path, 'hosts'),
