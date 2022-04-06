@@ -127,6 +127,7 @@ def get_install_software(software):
         'apt': {
             'name': software,
             'state': 'latest',
+            'update_cache': 'yes',
         }
     }
 
