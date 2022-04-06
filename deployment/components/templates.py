@@ -36,8 +36,12 @@ _remove_user_suffix = {
 
 
 def get_sync_user_play(all_hosts, remote_user, users_to_add, users_to_remove):
+    # Generate host group in host file
+    host_map = {
+        'all': [all_hosts]
+    }
     if not users_to_add and not users_to_remove:
-        return None
+        return None, host_map
 
     # Find common hosts
     host_group_user_map = defaultdict(lambda: [[], []])
@@ -47,11 +51,17 @@ def get_sync_user_play(all_hosts, remote_user, users_to_add, users_to_remove):
     for user_to_remove, target_machines in users_to_add.items():
         host_group_user_map[tuple(target_machines)][1].append(user_to_remove)
 
+    machine_group_idx = 0
+
     new_book = []
 
     for host_group, [users_to_add, users_to_remove] in host_group_user_map.items():
+        host_group_name = f'machine_group_{machine_group_idx}'
+        host_map[host_group_name] = list(host_group)
+
+        machine_group_idx += 1
         new_play = deepcopy(_sync_user_play)
-        new_play['hosts'] = ','.join(host_group)
+        new_play['hosts'] = host_group_name
         new_play['remote_user'] = remote_user
 
         new_play['tasks'] += map(lambda u: get_add_user_task(u.name, u.group), users_to_add)
@@ -65,7 +75,7 @@ def get_sync_user_play(all_hosts, remote_user, users_to_add, users_to_remove):
         new_book.append(new_play)
 
     print(new_book)
-    return new_book
+    return new_book, host_map
 
 
 def get_user_info(name, group):
@@ -126,7 +136,7 @@ def get_sync_software_play(hosts, remote_user, softwares_to_install):
         return None
     print(softwares_to_install)
     new_play = deepcopy(_sync_software_play)
-    new_play['hosts'] = hosts
+    new_play['hosts'] = 'all' # sync software to all machines
     new_play['remote_user'] = remote_user
 
     new_play['tasks'] += map(lambda s: get_install_software(s.name), softwares_to_install)

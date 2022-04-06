@@ -20,7 +20,7 @@ def dump_to_playbook_at(path, playbooks):
         yaml.safe_dump_all(playbooks, f)
 
 
-def generate_ini_file(host_map):
+def generate_ini_file_at(host_map, path):
     from configparser import ConfigParser
     config = ConfigParser(allow_no_value=True)
 
@@ -29,5 +29,6 @@ def generate_ini_file(host_map):
         for host in hosts:
             config.set(group, host)
 
-    with open('resources/monitoring/hosts', 'w+') as f:
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    with open(path, 'w+') as f:
         config.write(f)

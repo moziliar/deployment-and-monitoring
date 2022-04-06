@@ -1,3 +1,5 @@
+import os
+
 import rpyc
 from dotenv import load_dotenv
 
@@ -5,7 +7,7 @@ from components.machine import machine_list, MachineCannotSyncException
 from components.software import software_list
 from components.usergroup import user_list
 from report.report import report
-from utils.file import dump_to_playbook_at
+from utils.file import dump_to_playbook_at, generate_ini_file_at
 from utils.token import verify_user
 from utils.run import run_ansible_at
 
@@ -72,15 +74,22 @@ class DeploymentService(rpyc.Service):
             self.conn.root.client_print('machines not ready to sync')
             return
 
-        user_sync_file = user_list.diff_all_on_machines(machine_list.machines.keys())
+        playbook_dir = '/tmp/ansible'
+        user_play_name = 'user_play.yaml'
+        software_play_name = 'software_play.yaml'
+
+        user_sync_file, host_map = user_list.diff_all_on_machines(machine_list.machines.keys())
         software_sync_file = software_list.diff_all_on_machines(machine_list.machines.keys())
 
-        dump_to_playbook_at('/tmp/ansible/user_play.yaml', user_sync_file)
-        dump_to_playbook_at('/tmp/ansible/software_play.yaml', software_sync_file)
+        generate_ini_file_at(host_map, os.path.join(playbook_dir, 'hosts'))
 
-        completed_proc = run_ansible_at('/tmp/ansible/user_play.yaml')
+        dump_to_playbook_at(os.path.join(playbook_dir, user_play_name), user_sync_file)
+        dump_to_playbook_at(os.path.join(playbook_dir, software_play_name), software_sync_file)
+
+        completed_proc = run_ansible_at(playbook_dir, user_play_name)
         self.conn.root.client_print(completed_proc.stdout)
-        completed_proc = run_ansible_at('/tmp/ansible/software_play.yaml')
+
+        completed_proc = run_ansible_at(playbook_dir, software_play_name)
         self.conn.root.client_print(completed_proc.stdout)
 
         report.save_to_yaml()
