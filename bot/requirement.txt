@@ -1,0 +1,9 @@
+autopep8
+pylint
+
+python-telegram-bot
+requests
+python-dotenv
+paramiko
+
+psutil

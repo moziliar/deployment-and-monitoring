@@ -1,0 +1,11 @@
+# created by virtualenv automatically
+
+# virtualenv stuff
+venv/
+log/*
+pyvenv.cfg
+**/__pycache__
+
+.env
+
+nodes.txt
