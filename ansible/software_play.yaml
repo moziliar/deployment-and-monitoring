@@ -3,10 +3,6 @@
   remote_user: mzr
   tasks:
   - apt:
-      name: gcc
+      name: cargo
       state: latest
     name: Ensure gcc is installed and at the latest version
-  - apt:
-      name: clang-11
-      state: latest
-    name: Ensure clang-11 is installed and at the latest version

@@ -66,6 +66,30 @@ class UserGroup(DataEntity):
                 ret['users'][user] = None
         return ret
 
+    def diff_on_machines(self, machines):
+        users_to_add = {}
+        users_to_remove = {}
+
+        self.inspect_on_machines(machines)
+
+        # Inspect missing users
+        for _, user in self.users.items():
+            diff = set(machines) - set(self.remote_user_to_machines.get(user.name))
+            if user.name not in self.remote_user_to_machines:
+                # Add user on all machines
+                diff = set(machines)
+            users_to_add[user] = diff
+
+        # Inspect extra users
+        for username, remote_machines in self.remote_user_to_machines.items():
+            diff = set(remote_machines) - set(machines)
+            if username not in self.remote_user_to_machines:
+                # Remove user on all remote machines
+                diff = set(remote_machines)
+            users_to_remove[self.users[username]] = diff
+
+        return users_to_add, users_to_remove
+
     def inspect_on_machines(self, machines):
         self.machine_set = set(machines)
         for machine in machines:
@@ -78,33 +102,6 @@ class UserGroup(DataEntity):
             for user_str in filter(lambda u: u.strip() != '', users):
                 name, _, uid, gid, _, homedir, shell = user_str.split(':')
                 self.remote_user_to_machines[name].append(machine)
-
-    def diff_on_machines(self, machines):
-        users_to_add = {}
-        users_to_remove = {}
-
-        self.inspect_on_machines(machines)
-
-        # Inspect missing users
-        for user, _ in self.users.items():
-            if user not in self.remote_user_to_machines:
-                users_to_add[self.users[user]] = machines
-                continue
-            diff = set(machines) - set(self.remote_user_to_machines.get(user))
-            if diff:
-                users_to_add[self.users[user]] = diff
-
-        # Inspect extra users
-        for user, remote_machines in self.remote_user_to_machines.items():
-            if user not in self.remote_user_to_machines:
-                # Add user
-                users_to_remove[self.users[user]] = remote_machines
-                continue
-            diff = set(remote_machines) - set(machines)
-            if diff:
-                users_to_remove[self.users[user]] = diff
-
-        return users_to_add, users_to_remove
 
 
 class User(object):
