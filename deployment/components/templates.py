@@ -173,4 +173,4 @@ def get_sync_software_play(hosts, remote_user, softwares_to_install):
     new_play['remote_user'] = remote_user
 
     new_play['tasks'] += map(lambda s: get_install_software(s.name), softwares_to_install)
-    return [new_play]
+    return new_play
