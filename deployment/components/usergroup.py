@@ -74,16 +74,18 @@ class UserGroup(DataEntity):
 
         # Inspect missing users
         for _, user in self.users.items():
-            diff = set(machines) - set(self.remote_user_to_machines.get(user.name))
-            if user.name not in self.remote_user_to_machines:
+            if user.name in self.remote_user_to_machines:
+                diff = set(machines) - set(self.remote_user_to_machines.get(user.name))
+            else:
                 # Add user on all machines
                 diff = set(machines)
             users_to_add[user] = diff
 
         # Inspect extra users
         for username, remote_machines in self.remote_user_to_machines.items():
-            diff = set(remote_machines) - set(machines)
-            if username not in self.remote_user_to_machines:
+            if username in self.remote_user_to_machines:
+                diff = set(remote_machines) - set(machines)
+            else:
                 # Remove user on all remote machines
                 diff = set(remote_machines)
             users_to_remove[self.users[username]] = diff
