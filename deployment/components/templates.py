@@ -71,7 +71,7 @@ def get_sync_user_play(all_hosts, remote_user, users_to_add, users_to_remove):
     new_usergroup_play['remote_user'] = remote_user
     for usergroup in set([user.group for _, user in users_to_add]):
         new_usergroup_play['tasks'].append(get_add_usergroup_task(usergroup))
-    new_book.append([new_usergroup_play])
+    new_book.append(new_usergroup_play)
 
     for host_group, [users_to_add, users_to_remove] in host_group_user_map.items():
         host_group_name = f'machine_group_{machine_group_idx}'
@@ -89,7 +89,7 @@ def get_sync_user_play(all_hosts, remote_user, users_to_add, users_to_remove):
         new_play['tasks'] += map(lambda u: get_remove_user_password(u.name), users_to_add)
         new_play['tasks'] += map(lambda u: get_expire_user_password(u.name), users_to_add)
 
-        new_book.append([new_play])
+        new_book.append(new_play)
 
     return new_book, host_map
 

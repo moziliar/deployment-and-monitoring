@@ -17,7 +17,7 @@ def dump_to_playbook_at(path, playbooks):
         return
     os.makedirs(os.path.dirname(path), exist_ok=True)
     with open(path, 'w+') as f:
-        yaml.safe_dump_all(playbooks, f)
+        yaml.safe_dump(playbooks, f)
 
 
 def generate_ini_file_at(host_map, path):
