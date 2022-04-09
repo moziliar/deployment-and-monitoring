@@ -71,10 +71,8 @@ def get_sync_user_play(all_hosts, remote_user, users_to_add, users_to_remove):
         new_play['tasks'] += map(lambda u: get_remove_user_password(u.name), users_to_add)
         new_play['tasks'] += map(lambda u: get_expire_user_password(u.name), users_to_add)
 
-        print(new_play)
-        new_book.append(new_play)
+        new_book.append([new_play])
 
-    print(new_book)
     return new_book, host_map
 
 
@@ -141,5 +139,4 @@ def get_sync_software_play(hosts, remote_user, softwares_to_install):
     new_play['remote_user'] = remote_user
 
     new_play['tasks'] += map(lambda s: get_install_software(s.name), softwares_to_install)
-    print(new_play)
     return [new_play]
