@@ -31,7 +31,6 @@ class MonitorDaemon(threading.Thread):
         while True:
             def exec_cmd(command, stdout_callback):
                 for hostname, (output, success) in ssh.exec_on_all_machines(nodes_to_read, command).items():
-                    print(hostname)
                     if not success:
                         nodes[hostname].is_up = False
                         continue

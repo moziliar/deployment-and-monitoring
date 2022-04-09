@@ -44,10 +44,14 @@ class DeploymentService(rpyc.Service):
             rpyc.classic.obtain(software_list_data),
             rpyc.classic.obtain(user_list_data)
         )
+        self.conn.root.client_print('inspecting machine information')
         machine_list.inspect_all()
+        self.conn.root.client_print('inspecting software on all machines')
         software_list.inspect_all_on_machines(machine_list.machines.keys())
+        self.conn.root.client_print('inspecting users on all machines')
         user_list.inspect_all_on_machines(machine_list.machines.keys())
 
+        self.conn.root.client_print('save to client resource state file')
         # Write back at client side
         self.conn.root.save_yaml(
             machine_list.get_data(),
@@ -79,14 +83,18 @@ class DeploymentService(rpyc.Service):
         user_play_name = 'user_play.yaml'
         software_play_name = 'software_play.yaml'
 
+        self.conn.root.client_print('diff users on all machines')
         user_sync_file, host_map = user_list.diff_all_on_machines(machine_list.machines.keys())
+        self.conn.root.client_print('diff software on all machines')
         software_sync_file = software_list.diff_all_on_machines(machine_list.machines.keys())
 
+        self.conn.root.client_print('generate ansible playbooks')
         generate_ini_file_at(host_map, os.path.join(playbook_dir, 'hosts'))
 
         dump_to_playbook_at(os.path.join(playbook_dir, user_play_name), user_sync_file)
         dump_to_playbook_at(os.path.join(playbook_dir, software_play_name), software_sync_file)
 
+        self.conn.root.client_print('run ansible playbooks')
         proc = run_ansible_at(playbook_dir, user_play_name)
         time.sleep(1)
         while proc.poll() is None:
@@ -101,6 +109,7 @@ class DeploymentService(rpyc.Service):
             self.conn.root.client_print('ansible still running')
         self.conn.root.client_print(proc.stdout)
 
+        self.conn.root.client_print('save changes to report')
         report.save_to_yaml()
 
 

@@ -2,11 +2,23 @@ from collections import defaultdict
 from copy import deepcopy
 from string import Template
 
+_sync_usergroup_play = {
+    'name': 'Update usergroups on machines',
+    'hosts': 'all',
+    'remote_user': 'TODO',
+    'tasks': []
+}
+
 _sync_user_play = {
-    'name': 'Update lab machines',
+    'name': 'Update users on machines',
     'hosts': 'TODO',
     'remote_user': 'TODO',
     'tasks': []
+}
+
+_usergroup_info = {
+    'name': 'TODO',
+    'state': 'present'
 }
 
 # User info section
@@ -55,6 +67,11 @@ def get_sync_user_play(all_hosts, remote_user, users_to_add, users_to_remove):
 
     new_book = []
 
+    new_usergroup_play = deepcopy(_sync_usergroup_play)
+    for usergroup in set([user.group for _, user in users_to_add.items()]):
+        new_usergroup_play['tasks'].append(get_add_usergroup_task(usergroup))
+    new_book.append([new_usergroup_play])
+
     for host_group, [users_to_add, users_to_remove] in host_group_user_map.items():
         host_group_name = f'machine_group_{machine_group_idx}'
         host_map[host_group_name] = list(host_group)
@@ -76,6 +93,19 @@ def get_sync_user_play(all_hosts, remote_user, users_to_add, users_to_remove):
     return new_book, host_map
 
 
+def get_usergroup_info(name):
+    new_usergroup = deepcopy(_usergroup_info)
+    new_usergroup['name'] = name
+    return new_usergroup
+
+
+def get_add_usergroup_task(name):
+    return {
+        'name': f'ensure usergroup {name} exists',
+        'group': get_usergroup_info(name)
+    }
+
+
 def get_user_info(name, group):
     new_user = deepcopy(_user_info)
     new_user['name'] = name
@@ -93,7 +123,10 @@ def get_add_user_task(name, group):
 def get_remove_user_task(name, group):
     return {
         'name': f'remove user {name}',
-        'user': {**get_user_info(name, group), **_remove_user_suffix}
+        'user': {
+            **get_user_info(name, group),
+            **_remove_user_suffix
+        }
     }
 
 
