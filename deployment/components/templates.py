@@ -68,7 +68,8 @@ def get_sync_user_play(all_hosts, remote_user, users_to_add, users_to_remove):
     new_book = []
 
     new_usergroup_play = deepcopy(_sync_usergroup_play)
-    for usergroup in set([user.group for _, user in users_to_add.items()]):
+    new_usergroup_play['remote_user'] = remote_user
+    for usergroup in set([user.group for _, user in users_to_add]):
         new_usergroup_play['tasks'].append(get_add_usergroup_task(usergroup))
     new_book.append([new_usergroup_play])
 
