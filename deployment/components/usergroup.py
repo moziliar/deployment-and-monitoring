@@ -88,7 +88,7 @@ class UserGroup(DataEntity):
             else:
                 # Remove user on all remote machines
                 diff = set(remote_machines)
-            users_to_remove[self.users[username]] = diff
+            users_to_remove[self.users.get(username)] = diff
 
         return users_to_add, users_to_remove
 

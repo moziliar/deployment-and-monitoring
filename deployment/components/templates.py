@@ -60,7 +60,7 @@ def get_sync_user_play(all_hosts, remote_user, users_to_add, users_to_remove):
     for user_to_add, target_machines in users_to_add.items():
         host_group_user_map[tuple(target_machines)][0].append(user_to_add)
 
-    for user_to_remove, target_machines in users_to_add.items():
+    for user_to_remove, target_machines in users_to_remove.items():
         host_group_user_map[tuple(target_machines)][1].append(user_to_remove)
 
     machine_group_idx = 0
